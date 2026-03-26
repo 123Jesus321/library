@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чтение книги</title>
+    <link rel="stylesheet" href="books.css">
+</head>
+<body>
+    <main class="reader-page">
+        <header class="reader-header">
+            <a class="back-btn" href="index.html">← К выбору книг</a>
+            <div class="reader-book-meta">
+                <p class="reader-label">Сейчас открыта книга</p>
+                <h1 id="reader-title">Загрузка...</h1>
+            </div>
+        </header>
+
+        <section class="reader-frame-wrap">
+            <iframe
+                id="reader-frame"
+                class="reader-frame"
+                src=""
+                title="PDF книга"
+                loading="lazy"
+            ></iframe>
+        </section>
+    </main>
+
+    <script src="books.js"></script>
+</body>
+</html>
