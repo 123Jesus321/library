@@ -6,16 +6,22 @@ const books = [
         pdf: "Бредни-Сумасшедшего.pdf"
     },
     {
-        id: "crime-and-punishment",
-        title: "Преступление и наказание",
-        author: "Ф. М. Достоевский",
-        pdf: "https://www.gutenberg.org/files/2554/2554-pdf.pdf"
+        id: "Зеронтар (1)",
+        title: "Зеронтар",
+        author: "Конфетки Миллер",
+        pdf: "Зеронтар(1).pdf"
     },
     {
-        id: "dead-souls",
-        title: "Мертвые души",
-        author: "Н. В. Гоголь",
-        pdf: "https://www.gutenberg.org/files/1081/1081-pdf.pdf"
+        id: "Азантир и его устройство (2)",
+        title: "Азантир и его устройство",
+        author: "Конфетки Миллер",
+        pdf: "Азантир и его устройство(2).pdf"
+    },
+    {
+        id: "Битва за Азантир (1)",
+        title: "Битва за Азантир",
+        author: "Конфетки Миллер",
+        pdf: "Битва за Азантир(1).pdf"
     }
 ];
 
