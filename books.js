@@ -3,7 +3,7 @@ const books = [
         id: "Бредни-Сумасшедшего",
         title: "Бредни Сумасшедшего",
         author: "Pierrot<3",
-        pdf: "https://github.com/123Jesus321/library/blob/main/Бредни-Сумасшедшего.pdf"
+        pdf: "Бредни-Сумасшедшего.pdf"
     },
     {
         id: "crime-and-punishment",
