@@ -34,8 +34,7 @@ const books = [
         title: "Cetus",
         author: "SomeBadHum",
         pdf: "Cetus.pdf"
-    }
-];
+    }];
 
 function renderLibrary() {
     const grid = document.getElementById("book-grid");
