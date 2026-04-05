@@ -29,7 +29,14 @@ const books = [
     
         author: "Конфетки Миллер",
         pdf: "Сотворение.pdf"
-    }];
+    }
+    {
+        id: "Cetus",
+        title: "Cetus",
+        author: "SomeBadHum",
+        pdf: "Cetus.pdf"
+    },
+];
 
 function renderLibrary() {
     const grid = document.getElementById("book-grid");
