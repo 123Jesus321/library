@@ -28,6 +28,12 @@ const books = [
         title: "Сотворение",
         author: "Конфетки Миллер",
         pdf: "Сотворение.pdf"
+    },
+    {
+        id: "Cetus",
+        title: "Cetus",
+        author: "SomeBadHum",
+        pdf: "Cetus.pdf"
     }];
 
 function renderLibrary() {
