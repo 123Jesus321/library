@@ -40,6 +40,12 @@ const books = [
         title: "Алая-вспышка",
         author: "Hedvik",
         pdf: "Алая-вспышка.pdf"
+    },
+    {
+        id: "Сборник Стихотворений",
+        title: "Сборник Стихотворений",
+        author: "SomeBadHum",
+        pdf: "Сборник Стихотворений.pdf"
     }];
 
 function renderLibrary() {
