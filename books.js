@@ -34,6 +34,12 @@ const books = [
         title: "Cetus",
         author: "SomeBadHum",
         pdf: "Cetus.pdf"
+    },
+    {
+        id: "Алая-вспышка",
+        title: "Алая-вспышка",
+        author: "Hedvik",
+        pdf: "Алая-вспышка.pdf"
     }];
 
 function renderLibrary() {
