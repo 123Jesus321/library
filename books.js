@@ -45,7 +45,7 @@ const books = [
         id: "Сборник Стихотворений",
         title: "Сборник Стихотворений",
         author: "SomeBadHum",
-        pdf: "Сборник Стихотворений.pdf"
+        pdf: "Сборник-Стихов.pdf"
     }];
 
 function renderLibrary() {
