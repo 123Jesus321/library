@@ -16,12 +16,23 @@
             </div>
         </header>
 
-        <section class="reader-frame-wrap">
+        <section class="reader-frame-wrap" id="reader-frame-wrap">
+            <div id="pdf-view" class="pdf-view" hidden>
+                <div class="pdf-viewport" id="pdf-viewport" role="region" aria-label="Страница книги">
+                    <canvas id="pdf-canvas"></canvas>
+                    <p id="pdf-error" class="pdf-error" hidden></p>
+                </div>
+                <nav class="pdf-toolbar" aria-label="Навигация по страницам">
+                    <button type="button" class="pdf-nav-btn" id="pdf-prev" aria-label="Предыдущая страница">← Назад</button>
+                    <span id="pdf-page-label" class="pdf-page-label">—</span>
+                    <button type="button" class="pdf-nav-btn" id="pdf-next" aria-label="Следующая страница">Вперёд →</button>
+                </nav>
+            </div>
             <iframe
                 id="reader-frame"
                 class="reader-frame"
                 src=""
-                title="PDF книга"
+                title="Документ книги"
                 loading="lazy"
             ></iframe>
         </section>
