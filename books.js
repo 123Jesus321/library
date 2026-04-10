@@ -1,15 +1,15 @@
-const books = [
-    {
+const books = [    
+    {        
         id: "Бредни-Сумасшедшего",
         title: "Бредни Сумасшедшего",
-        author: "Pierrot<3",
-        pdf: "Бредни Сумасшедшего.odt"
+        author: "Сумасшедший",
+        pdf: "Бредни-Сумасшедшего.pdf"
     },
     {
-        id: "Зеронтар-_1",
+        id: "Зеронтар-_1_",
         title: "Зеронтар",
         author: "Конфетки Миллер",
-        pdf: "Зеронтар-_1.pdf"
+        pdf: "Зеронтар-_1_.pdf"
     },
     {
         id: "Азантир-и-его-устройство-_2_",
@@ -28,9 +28,25 @@ const books = [
         title: "Сотворение",
         author: "Конфетки Миллер",
         pdf: "Сотворение.pdf"
-    }
-];
-
+    },
+    {
+        id: "Cetus",
+        title: "Cetus",
+        author: "SomeBadHum",
+        pdf: "Cetus.pdf"
+    },
+    {
+        id: "Алая-вспышка",
+        title: "Алая-вспышка",
+        author: "Hedvik",
+        pdf: "Алая-вспышка.pdf"
+    },
+    {
+        id: "Сборник Стихотворений",
+        title: "Сборник Стихотворений",
+        author: "SomeBadHum",
+        pdf: "Сборник-Стихов.pdf"
+    }];
 function renderLibrary() {
     const grid = document.getElementById("book-grid");
     if (!grid) return;
