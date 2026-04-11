@@ -23,65 +23,144 @@ body {
 /* --- Темы фона (переключатель: data-bg-theme на body) --- */
 
 body[data-bg-theme="crimson-violet"] {
-    background-color: #15081f;
+    background-color: #0c0614;
     background-image:
-        radial-gradient(ellipse 120% 80% at 0% 0%, rgba(139, 92, 246, 0.22), transparent 55%),
-        radial-gradient(ellipse 100% 70% at 100% 100%, rgba(244, 63, 94, 0.18), transparent 50%),
-        radial-gradient(circle at 50% 40%, rgba(167, 139, 250, 0.12), transparent 45%),
-        linear-gradient(128deg, #0f0618 0%, #1e0f3a 22%, #4c1030 52%, #6b1a28 78%, #2d0f24 100%);
+        radial-gradient(ellipse 130% 95% at 0% 0%, rgba(167, 139, 250, 0.32), transparent 58%),
+        radial-gradient(ellipse 100% 78% at 100% 100%, rgba(244, 63, 94, 0.26), transparent 54%),
+        radial-gradient(ellipse 65% 55% at 78% 12%, rgba(236, 72, 153, 0.14), transparent 52%),
+        radial-gradient(circle at 48% 42%, rgba(109, 40, 217, 0.18), transparent 50%),
+        linear-gradient(132deg, #05030a 0%, #12081f 14%, #1a0f32 34%, #3d0f28 54%, #5c1522 72%, #1a0d16 92%, #08040c 100%);
 }
 
 body[data-bg-theme="blue-violet"] {
-    background-color: #050e1e;
+    background-color: #030a18;
     background-image:
-        radial-gradient(ellipse 110% 90% at 10% 0%, rgba(56, 189, 248, 0.2), transparent 55%),
-        radial-gradient(ellipse 90% 80% at 95% 100%, rgba(99, 102, 241, 0.22), transparent 52%),
-        radial-gradient(circle at 40% 60%, rgba(14, 165, 233, 0.1), transparent 42%),
-        linear-gradient(135deg, #020617 0%, #0c4a6e 28%, #312e81 58%, #1e1b4b 85%, #020617 100%);
+        radial-gradient(ellipse 115% 95% at 8% 0%, rgba(56, 189, 248, 0.28), transparent 58%),
+        radial-gradient(ellipse 95% 85% at 96% 100%, rgba(99, 102, 241, 0.3), transparent 55%),
+        radial-gradient(ellipse 70% 60% at 25% 75%, rgba(14, 165, 233, 0.12), transparent 52%),
+        radial-gradient(circle at 45% 38%, rgba(59, 130, 246, 0.1), transparent 48%),
+        linear-gradient(138deg, #010208 0%, #082038 18%, #0c4a6e 36%, #1e3a5f 56%, #312e81 74%, #0f172a 90%, #020617 100%);
 }
 
 body[data-bg-theme="gold-crimson"] {
-    background-color: #1a0a08;
+    background-color: #140805;
     background-image:
-        radial-gradient(ellipse 100% 75% at 15% 10%, rgba(251, 191, 36, 0.25), transparent 50%),
-        radial-gradient(ellipse 90% 70% at 90% 85%, rgba(220, 38, 38, 0.22), transparent 48%),
-        radial-gradient(circle at 55% 35%, rgba(245, 158, 11, 0.14), transparent 40%),
-        linear-gradient(145deg, #1c0707 0%, #422006 25%, #7f1d1d 55%, #450a0a 82%, #0c0404 100%);
+        radial-gradient(ellipse 105% 80% at 12% 8%, rgba(251, 191, 36, 0.32), transparent 54%),
+        radial-gradient(ellipse 92% 75% at 92% 88%, rgba(220, 38, 38, 0.28), transparent 52%),
+        radial-gradient(ellipse 55% 45% at 58% 32%, rgba(245, 158, 11, 0.18), transparent 48%),
+        radial-gradient(circle at 20% 60%, rgba(180, 83, 9, 0.12), transparent 50%),
+        linear-gradient(148deg, #0a0303 0%, #2a1006 20%, #422006 40%, #7f1d1d 58%, #450a0a 78%, #0c0404 96%, #050202 100%);
 }
 
 body[data-bg-theme="red-black"] {
     background-color: #000000;
     background-image:
-        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(185, 28, 28, 0.35), transparent 55%),
-        radial-gradient(ellipse 70% 50% at 80% 100%, rgba(127, 29, 29, 0.2), transparent 50%),
-        linear-gradient(168deg, #000000 0%, #1c0508 35%, #450a0a 62%, #7f1d1d 82%, #000000 100%);
+        radial-gradient(ellipse 90% 70% at 50% -5%, rgba(220, 38, 38, 0.42), transparent 58%),
+        radial-gradient(ellipse 75% 55% at 85% 100%, rgba(127, 29, 29, 0.28), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 15% 70%, rgba(153, 27, 27, 0.15), transparent 50%),
+        linear-gradient(172deg, #000000 0%, #140205 28%, #3f0a0f 52%, #6b1418 68%, #2a0608 88%, #000000 100%);
 }
 
 body[data-bg-theme="emerald-abyss"] {
-    background-color: #020f1a;
+    background-color: #020c14;
     background-image:
-        radial-gradient(ellipse 100% 85% at 0% 100%, rgba(16, 185, 129, 0.18), transparent 55%),
-        radial-gradient(ellipse 90% 75% at 100% 0%, rgba(6, 182, 212, 0.14), transparent 50%),
-        radial-gradient(circle at 30% 30%, rgba(45, 212, 191, 0.08), transparent 45%),
-        linear-gradient(155deg, #020617 0%, #064e3b 32%, #022c22 58%, #0f172a 88%, #020617 100%);
+        radial-gradient(ellipse 105% 90% at 0% 100%, rgba(16, 185, 129, 0.26), transparent 58%),
+        radial-gradient(ellipse 95% 80% at 100% 0%, rgba(6, 182, 212, 0.2), transparent 54%),
+        radial-gradient(ellipse 60% 50% at 32% 28%, rgba(45, 212, 191, 0.12), transparent 50%),
+        radial-gradient(circle at 70% 65%, rgba(4, 120, 87, 0.14), transparent 48%),
+        linear-gradient(158deg, #010608 0%, #022c22 24%, #064e3b 44%, #042f2e 62%, #0f172a 82%, #020617 100%);
 }
 
 body[data-bg-theme="sunset-orchid"] {
-    background-color: #1a0520;
+    background-color: #120418;
     background-image:
-        radial-gradient(ellipse 110% 80% at 0% 50%, rgba(244, 114, 182, 0.2), transparent 52%),
-        radial-gradient(ellipse 100% 70% at 100% 20%, rgba(251, 146, 60, 0.22), transparent 50%),
-        radial-gradient(circle at 60% 80%, rgba(192, 132, 252, 0.12), transparent 42%),
-        linear-gradient(125deg, #2e1065 0%, #831843 28%, #9f1239 52%, #4c1d95 78%, #1e1b4b 100%);
+        radial-gradient(ellipse 115% 85% at 0% 48%, rgba(244, 114, 182, 0.26), transparent 56%),
+        radial-gradient(ellipse 100% 75% at 100% 18%, rgba(251, 146, 60, 0.28), transparent 54%),
+        radial-gradient(ellipse 70% 55% at 62% 82%, rgba(192, 132, 252, 0.18), transparent 50%),
+        radial-gradient(circle at 40% 25%, rgba(219, 39, 119, 0.12), transparent 48%),
+        linear-gradient(128deg, #1a0528 0%, #4c0d3a 22%, #831843 42%, #9f1239 58%, #4c1d95 78%, #1e1b4b 94%, #0f0a1a 100%);
 }
 
 body[data-bg-theme="arctic-plum"] {
-    background-color: #0b1020;
+    background-color: #060a14;
     background-image:
-        radial-gradient(ellipse 120% 90% at 50% -10%, rgba(186, 230, 253, 0.12), transparent 45%),
-        radial-gradient(ellipse 90% 80% at 0% 100%, rgba(99, 102, 241, 0.16), transparent 52%),
-        radial-gradient(ellipse 85% 70% at 100% 50%, rgba(139, 92, 246, 0.14), transparent 48%),
-        linear-gradient(160deg, #020617 0%, #1e3a5f 30%, #312e81 55%, #1e1b4b 80%, #020617 100%);
+        radial-gradient(ellipse 125% 95% at 50% -12%, rgba(186, 230, 253, 0.16), transparent 50%),
+        radial-gradient(ellipse 92% 82% at 0% 100%, rgba(99, 102, 241, 0.22), transparent 56%),
+        radial-gradient(ellipse 88% 72% at 100% 45%, rgba(139, 92, 246, 0.2), transparent 52%),
+        radial-gradient(circle at 55% 30%, rgba(56, 189, 248, 0.08), transparent 46%),
+        linear-gradient(162deg, #010308 0%, #0f172a 18%, #1e3a5f 38%, #312e81 58%, #1e1b4b 78%, #020617 100%);
+}
+
+/* --- Дополнительные тёмные темы --- */
+
+body[data-bg-theme="noir-teal"] {
+    background-color: #020808;
+    background-image:
+        radial-gradient(ellipse 120% 100% at 15% 0%, rgba(45, 212, 191, 0.22), transparent 58%),
+        radial-gradient(ellipse 95% 85% at 100% 100%, rgba(13, 148, 136, 0.26), transparent 55%),
+        radial-gradient(ellipse 70% 60% at 75% 20%, rgba(6, 182, 212, 0.12), transparent 52%),
+        radial-gradient(circle at 30% 70%, rgba(15, 118, 110, 0.16), transparent 50%),
+        linear-gradient(152deg, #020404 0%, #042f2e 26%, #0d3d38 48%, #134e4a 64%, #0c1929 86%, #020617 100%);
+}
+
+body[data-bg-theme="wine-midnight"] {
+    background-color: #0a040c;
+    background-image:
+        radial-gradient(ellipse 110% 90% at 0% 100%, rgba(88, 28, 135, 0.28), transparent 56%),
+        radial-gradient(ellipse 100% 80% at 100% 0%, rgba(157, 23, 77, 0.24), transparent 54%),
+        radial-gradient(ellipse 65% 55% at 45% 45%, rgba(190, 24, 93, 0.14), transparent 50%),
+        radial-gradient(circle at 80% 75%, rgba(76, 29, 149, 0.18), transparent 48%),
+        linear-gradient(140deg, #050208 0%, #1e0a1c 22%, #3b0764 44%, #4c0519 64%, #1e1030 84%, #0a0612 100%);
+}
+
+body[data-bg-theme="obsidian-dawn"] {
+    background-color: #060606;
+    background-image:
+        radial-gradient(ellipse 130% 85% at 50% -5%, rgba(253, 186, 116, 0.14), transparent 52%),
+        radial-gradient(ellipse 90% 75% at 0% 100%, rgba(249, 115, 22, 0.1), transparent 56%),
+        radial-gradient(ellipse 85% 70% at 100% 50%, rgba(244, 63, 94, 0.12), transparent 54%),
+        radial-gradient(circle at 35% 40%, rgba(71, 85, 105, 0.2), transparent 50%),
+        linear-gradient(165deg, #030303 0%, #0f0f12 24%, #1c1917 46%, #292524 62%, #0c0a09 88%, #000000 100%);
+}
+
+body[data-bg-theme="taiga-night"] {
+    background-color: #030a06;
+    background-image:
+        radial-gradient(ellipse 115% 95% at 100% 0%, rgba(34, 197, 94, 0.18), transparent 58%),
+        radial-gradient(ellipse 100% 85% at 0% 100%, rgba(21, 128, 61, 0.22), transparent 55%),
+        radial-gradient(ellipse 70% 60% at 55% 35%, rgba(74, 222, 128, 0.1), transparent 50%),
+        radial-gradient(circle at 20% 55%, rgba(22, 101, 52, 0.16), transparent 48%),
+        linear-gradient(148deg, #020806 0%, #052e16 28%, #14532d 50%, #166534 68%, #0f2918 88%, #030806 100%);
+}
+
+body[data-bg-theme="aurora-void"] {
+    background-color: #04040c;
+    background-image:
+        radial-gradient(ellipse 140% 90% at 10% 20%, rgba(52, 211, 153, 0.2), transparent 58%),
+        radial-gradient(ellipse 110% 80% at 90% 80%, rgba(34, 211, 238, 0.18), transparent 56%),
+        radial-gradient(ellipse 90% 70% at 50% 0%, rgba(167, 139, 250, 0.22), transparent 54%),
+        radial-gradient(ellipse 60% 50% at 70% 50%, rgba(129, 140, 248, 0.14), transparent 50%),
+        linear-gradient(125deg, #020617 0%, #0f172a 22%, #1e1b4b 42%, #312e81 58%, #134e4a 76%, #022c22 94%, #020617 100%);
+}
+
+body[data-bg-theme="graphite-fuchsia"] {
+    background-color: #08060a;
+    background-image:
+        radial-gradient(ellipse 120% 95% at 100% 0%, rgba(217, 70, 239, 0.26), transparent 58%),
+        radial-gradient(ellipse 95% 85% at 0% 100%, rgba(192, 38, 211, 0.2), transparent 55%),
+        radial-gradient(ellipse 70% 55% at 40% 60%, rgba(236, 72, 153, 0.12), transparent 50%),
+        radial-gradient(circle at 75% 25%, rgba(113, 113, 122, 0.22), transparent 52%),
+        linear-gradient(155deg, #09090b 0%, #18181b 26%, #27272a 44%, #3f3f46 60%, #1c1024 82%, #0a0a0c 100%);
+}
+
+body[data-bg-theme="copper-eclipse"] {
+    background-color: #0a0604;
+    background-image:
+        radial-gradient(ellipse 110% 90% at 50% 0%, rgba(251, 146, 60, 0.22), transparent 56%),
+        radial-gradient(ellipse 100% 80% at 0% 100%, rgba(180, 83, 9, 0.2), transparent 54%),
+        radial-gradient(ellipse 85% 70% at 100% 40%, rgba(234, 88, 12, 0.16), transparent 52%),
+        radial-gradient(circle at 30% 30%, rgba(69, 10, 10, 0.35), transparent 50%),
+        linear-gradient(168deg, #020203 0%, #1c1008 24%, #431407 46%, #7c2d12 64%, #292018 86%, #050403 100%);
 }
 
 /* Анимированный слой поверх цвета темы, под контентом */

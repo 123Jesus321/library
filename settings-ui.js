@@ -185,8 +185,9 @@
              * Угол ln.ang фиксирован после инициализации.
              */
             const tWave = time * 1.06;
-            const baseAmp = Math.min(w, h) * 0.44 * sf;
-            const bend = Math.sin(tWave) * baseAmp + Math.cos(tWave * 0.68) * baseAmp * 0.48;
+            /* Почти на всю меньшую сторону экрана; k ограничен долей хорды — максимальный изгиб без петель на кривой. */
+            const baseAmp = Math.min(w, h) * 0.96 * sf;
+            const bend = Math.sin(tWave) * baseAmp + Math.cos(tWave * 0.68) * baseAmp * 0.55;
             const alphaWave = 0.22 + Math.sin(tWave) * 0.1;
             particlesState.items.forEach((ln) => {
                 const c = Math.cos(ln.ang);
@@ -198,7 +199,11 @@
                 const x2 = ln.cx + c * ln.halfLen;
                 const y2 = ln.cy + s * ln.halfLen;
                 const chord = 2 * ln.halfLen;
-                const k = bend * 3.35;
+                let k = bend * 6.05;
+                const kMax = chord * 0.48;
+                if (Math.abs(k) > kMax) {
+                    k = Math.sign(k) * kMax;
+                }
                 const c1x = x1 + c * (chord / 3) + nx * k;
                 const c1y = y1 + s * (chord / 3) + ny * k;
                 const c2x = x1 + c * ((2 * chord) / 3) + nx * k;

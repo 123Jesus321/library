@@ -91,7 +91,14 @@ const BG_THEMES = [
     { id: "red-black", label: "Киноварь и ночь" },
     { id: "emerald-abyss", label: "Изумрудная бездна" },
     { id: "sunset-orchid", label: "Орхидея на закате" },
-    { id: "arctic-plum", label: "Ледяная слива" }
+    { id: "arctic-plum", label: "Ледяная слива" },
+    { id: "noir-teal", label: "Нуар и бирюза" },
+    { id: "wine-midnight", label: "Вино и полночь" },
+    { id: "obsidian-dawn", label: "Обсидиан и заря" },
+    { id: "taiga-night", label: "Тайга в ночи" },
+    { id: "aurora-void", label: "Северное сияние" },
+    { id: "graphite-fuchsia", label: "Графит и фуксия" },
+    { id: "copper-eclipse", label: "Медное затмение" }
 ];
 
 /** Только применяет тему к странице; сохранение — в settings-ui.js (единый объект настроек). */
