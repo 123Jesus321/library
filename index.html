@@ -12,10 +12,41 @@
             <p class="hero-kicker">Электронная библиотека</p>
             <h1>Выберите книгу и начните чтение</h1>
             <p class="hero-subtitle">
-                Нажмите на карточку — откроется чтение PDF. На телефоне и на компьютере можно развернуть просмотр на весь экран. Оценки сохраняются в этом браузере.
+                Фильтры по автору, названию, серии и дате обновления. На телефоне «Полный экран» разворачивает страницу без системного API (работает в Safari). Оценки хранятся в браузере.
             </p>
         </section>
 
+        <section class="library-filters" aria-label="Фильтры каталога">
+            <label class="filter-field">
+                <span class="filter-label">Название</span>
+                <input type="search" id="filter-q" class="filter-input" placeholder="Поиск по названию…" autocomplete="off">
+            </label>
+            <label class="filter-field">
+                <span class="filter-label">Автор</span>
+                <select id="filter-author" class="filter-select">
+                    <option value="">Все авторы</option>
+                </select>
+            </label>
+            <label class="filter-field">
+                <span class="filter-label">Серия</span>
+                <select id="filter-series" class="filter-select">
+                    <option value="">Все книги</option>
+                    <option value="__none__">Без серии</option>
+                </select>
+            </label>
+            <label class="filter-field">
+                <span class="filter-label">Сортировка</span>
+                <select id="filter-sort" class="filter-select">
+                    <option value="updated-desc">Дата обновления (новые сверху)</option>
+                    <option value="updated-asc">Дата обновления (старые сверху)</option>
+                    <option value="title-asc">Название А→Я</option>
+                    <option value="title-desc">Название Я→А</option>
+                    <option value="author-asc">Автор А→Я</option>
+                </select>
+            </label>
+        </section>
+
+        <p id="library-empty" class="library-empty" hidden>Ничего не найдено — измените фильтры.</p>
         <section id="book-grid" class="book-grid" aria-label="Список книг"></section>
     </main>
 

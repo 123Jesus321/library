@@ -25,7 +25,10 @@
             </div>
         </header>
 
+        <nav class="reader-series-bar" id="reader-series-bar" hidden aria-label="Книги серии"></nav>
+
         <section class="reader-frame-wrap" id="reader-frame-wrap">
+            <button type="button" id="reader-pseudo-fs-close" class="pseudo-fs-close" hidden aria-label="Выйти из полного экрана">✕</button>
             <div id="pdf-view" class="pdf-view" hidden>
                 <div class="pdf-viewport" id="pdf-viewport" role="region" aria-label="Страница книги">
                     <canvas id="pdf-canvas"></canvas>

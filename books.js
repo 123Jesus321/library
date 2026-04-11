@@ -1,57 +1,234 @@
-const books = [    
-    {        
+/** seriesId: общий id для книг одной серии; seriesOrder — порядок в серии; updatedAt — ISO для сортировки */
+const books = [
+    {
         id: "Бредни-Сумасшедшего",
         title: "Бредни Сумасшедшего",
         author: "Сумасшедший",
-        pdf: "Бредни-Сумасшедшего.pdf"
+        pdf: "Бредни-Сумасшедшего.pdf",
+        seriesId: null,
+        seriesTitle: null,
+        seriesOrder: null,
+        updatedAt: "2025-08-12"
     },
     {
         id: "Зеронтар-_1_",
         title: "Зеронтар",
         author: "Конфетки Миллер",
-        pdf: "Зеронтар-_1_.pdf"
+        pdf: "Зеронтар-_1_.pdf",
+        seriesId: "miller-azantir",
+        seriesTitle: "Мир Азантира",
+        seriesOrder: 1,
+        updatedAt: "2026-01-20"
     },
     {
         id: "Азантир-и-его-устройство-_2_",
         title: "Азантир и его устройство",
         author: "Конфетки Миллер",
-        pdf: "Азантир-и-его-устройство-_2_.pdf"
+        pdf: "Азантир-и-его-устройство-_2_.pdf",
+        seriesId: "miller-azantir",
+        seriesTitle: "Мир Азантира",
+        seriesOrder: 2,
+        updatedAt: "2026-02-03"
     },
     {
         id: "Битва-за-Азантир-_1_",
         title: "Битва за Азантир",
         author: "Конфетки Миллер",
-        pdf: "Битва-за-Азантир-_1_.pdf"
+        pdf: "Битва-за-Азантир-_1_.pdf",
+        seriesId: "miller-azantir",
+        seriesTitle: "Мир Азантира",
+        seriesOrder: 3,
+        updatedAt: "2026-02-18"
     },
     {
         id: "Сотворение",
         title: "Сотворение",
         author: "Конфетки Миллер",
-        pdf: "Сотворение.pdf"
+        pdf: "Сотворение.pdf",
+        seriesId: "miller-azantir",
+        seriesTitle: "Мир Азантира",
+        seriesOrder: 4,
+        updatedAt: "2026-03-01"
     },
     {
         id: "Cetus",
         title: "Cetus",
         author: "SomeBadHum",
-        pdf: "Cetus.pdf"
+        pdf: "Cetus.pdf",
+        seriesId: "somebadhum-prose",
+        seriesTitle: "Проза SomeBadHum",
+        seriesOrder: 1,
+        updatedAt: "2025-11-05"
     },
     {
         id: "Алая-вспышка",
         title: "Алая-вспышка",
         author: "Hedvik",
-        pdf: "Алая-вспышка.pdf"
+        pdf: "Алая-вспышка.pdf",
+        seriesId: null,
+        seriesTitle: null,
+        seriesOrder: null,
+        updatedAt: "2026-01-10"
     },
     {
         id: "Сборник Стихотворений",
         title: "Сборник Стихотворений",
         author: "SomeBadHum",
-        pdf: "Сборник-Стихов.pdf"
-    }];
+        pdf: "Сборник-Стихов.pdf",
+        seriesId: "somebadhum-prose",
+        seriesTitle: "Проза SomeBadHum",
+        seriesOrder: 2,
+        updatedAt: "2025-12-22"
+    }
+];
 
 const PDFJS_CDN = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
 const PDFJS_WORKER = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
+/** На ПК страница PDF визуально уже (окно просмотра без изменений), текст мельче */
+const DESKTOP_PDF_WIDTH_FACTOR = 0.72;
+const MOBILE_LAYOUT_MAX = 640;
+
 const RATING_STORAGE_KEY = "knigi-book-ratings-v1";
+
+function isDesktopReader() {
+    return window.matchMedia(`(min-width: ${MOBILE_LAYOUT_MAX + 1}px)`).matches;
+}
+
+function isMobileReader() {
+    return window.matchMedia(`(max-width: ${MOBILE_LAYOUT_MAX}px)`).matches;
+}
+
+function formatDateRu(iso) {
+    if (!iso) {
+        return "—";
+    }
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) {
+        return String(iso);
+    }
+    return d.toLocaleDateString("ru-RU", { year: "numeric", month: "short", day: "numeric" });
+}
+
+function getFilterState() {
+    const qEl = document.getElementById("filter-q");
+    const authorEl = document.getElementById("filter-author");
+    const seriesEl = document.getElementById("filter-series");
+    const sortEl = document.getElementById("filter-sort");
+    return {
+        q: (qEl && qEl.value ? qEl.value : "").trim(),
+        author: authorEl ? authorEl.value : "",
+        series: seriesEl ? seriesEl.value : "",
+        sort: sortEl && sortEl.value ? sortEl.value : "updated-desc"
+    };
+}
+
+function getFilteredBooks() {
+    let list = books.slice();
+    const { q, author, series, sort } = getFilterState();
+    const ql = q.toLowerCase();
+    if (ql) {
+        list = list.filter((b) => b.title.toLowerCase().includes(ql));
+    }
+    if (author) {
+        list = list.filter((b) => b.author === author);
+    }
+    if (series === "__none__") {
+        list = list.filter((b) => !b.seriesId);
+    } else if (series) {
+        list = list.filter((b) => b.seriesId === series);
+    }
+
+    const dateMs = (b) => {
+        const t = Date.parse(b.updatedAt || "");
+        return Number.isNaN(t) ? 0 : t;
+    };
+
+    switch (sort) {
+        case "updated-asc":
+            list.sort((a, b) => dateMs(a) - dateMs(b));
+            break;
+        case "title-asc":
+            list.sort((a, b) => a.title.localeCompare(b.title, "ru"));
+            break;
+        case "title-desc":
+            list.sort((a, b) => b.title.localeCompare(a.title, "ru"));
+            break;
+        case "author-asc":
+            list.sort(
+                (a, b) => a.author.localeCompare(b.author, "ru") || a.title.localeCompare(b.title, "ru")
+            );
+            break;
+        case "updated-desc":
+        default:
+            list.sort((a, b) => dateMs(b) - dateMs(a));
+    }
+    return list;
+}
+
+function populateFilterOptions() {
+    const authorSel = document.getElementById("filter-author");
+    const seriesSel = document.getElementById("filter-series");
+    if (!authorSel || !seriesSel) {
+        return;
+    }
+
+    const authors = [...new Set(books.map((b) => b.author))].sort((a, b) => a.localeCompare(b, "ru"));
+    const savedAuthor = authorSel.value;
+    authorSel.innerHTML =
+        `<option value="">Все авторы</option>` +
+        authors.map((a) => `<option value="${escapeAttr(a)}">${escapeHtml(a)}</option>`).join("");
+    if (authors.includes(savedAuthor)) {
+        authorSel.value = savedAuthor;
+    }
+
+    const seriesMap = new Map();
+    books.forEach((b) => {
+        if (b.seriesId && b.seriesTitle) {
+            seriesMap.set(b.seriesId, b.seriesTitle);
+        }
+    });
+    const savedSeries = seriesSel.value;
+    let seriesHtml = `<option value="">Все книги</option><option value="__none__">Без серии</option>`;
+    [...seriesMap.entries()]
+        .sort((x, y) => x[1].localeCompare(y[1], "ru"))
+        .forEach(([id, title]) => {
+            seriesHtml += `<option value="${escapeAttr(id)}">${escapeHtml(title)}</option>`;
+        });
+    seriesSel.innerHTML = seriesHtml;
+    const allowed = new Set(["", "__none__", ...seriesMap.keys()]);
+    if (allowed.has(savedSeries)) {
+        seriesSel.value = savedSeries;
+    }
+}
+
+let libraryFiltersBound = false;
+
+function bindLibraryFilters() {
+    const q = document.getElementById("filter-q");
+    const author = document.getElementById("filter-author");
+    const series = document.getElementById("filter-series");
+    const sort = document.getElementById("filter-sort");
+    if (!q && !author) {
+        return;
+    }
+    populateFilterOptions();
+    if (libraryFiltersBound) {
+        return;
+    }
+    libraryFiltersBound = true;
+
+    const rerender = () => renderLibrary();
+    [q, author, series, sort].forEach((el) => {
+        if (!el) {
+            return;
+        }
+        el.addEventListener("change", rerender);
+        if (el === q) {
+            el.addEventListener("input", rerender);
+        }
+    });
+}
 
 function escapeHtml(str) {
     return String(str)
@@ -142,11 +319,20 @@ function renderLibrary() {
         return;
     }
 
-    grid.innerHTML = books
+    const list = getFilteredBooks();
+    const emptyEl = document.getElementById("library-empty");
+    if (emptyEl) {
+        emptyEl.hidden = list.length > 0;
+    }
+
+    grid.innerHTML = list
         .map((book, idx) => {
             const rating = getBookRating(book.id);
             const href = `reader.html?book=${encodeURIComponent(book.id)}`;
             const prefix = `lib-${idx}`;
+            const seriesChip = book.seriesTitle
+                ? `<span class="book-series-chip">${escapeHtml(book.seriesTitle)}</span>`
+                : "";
             return `
             <article class="book-tile" data-book-id="${escapeAttr(book.id)}">
                 <a class="book-card" href="${href}">
@@ -156,6 +342,10 @@ function renderLibrary() {
                     <div class="book-info">
                         <h2>${escapeHtml(book.title)}</h2>
                         <p>${escapeHtml(book.author)}</p>
+                        <div class="book-meta-line">
+                            <span class="book-updated">${escapeHtml(formatDateRu(book.updatedAt))}</span>
+                            ${seriesChip}
+                        </div>
                     </div>
                 </a>
                 <div class="book-rating-bar">
@@ -299,7 +489,10 @@ async function renderPdfPage() {
     clearPdfError();
     const page = await doc.getPage(readerState.pageNum);
     const ctx = canvas.getContext("2d", { alpha: false });
-    const cssW = Math.max(1, vpEl.clientWidth - 16);
+    const usableW = Math.max(1, vpEl.clientWidth - 16);
+    const cssW = isDesktopReader()
+        ? Math.max(1, Math.floor(usableW * DESKTOP_PDF_WIDTH_FACTOR))
+        : usableW;
     const base = page.getViewport({ scale: 1 });
     const scale = cssW / base.width;
     const viewport = page.getViewport({ scale });
@@ -566,45 +759,151 @@ function initReaderRatingUi() {
 function bindFullscreenControls() {
     const btn = document.getElementById("reader-fullscreen-btn");
     const wrap = document.getElementById("reader-frame-wrap");
+    const closeBtn = document.getElementById("reader-pseudo-fs-close");
     if (!btn || !wrap || readerState.fullscreenBound) {
         return;
     }
     readerState.fullscreenBound = true;
 
+    const isApiFullscreen = () =>
+        !!(document.fullscreenElement || document.webkitFullscreenElement);
+    const isPseudoFullscreen = () => wrap.classList.contains("reader-frame-wrap--pseudo-fs");
+    const isAnyFullscreen = () => isApiFullscreen() || isPseudoFullscreen();
+
+    function exitPseudoFullscreen() {
+        wrap.classList.remove("reader-frame-wrap--pseudo-fs");
+        document.body.classList.remove("reader-fs-pseudo-active");
+        if (closeBtn) {
+            closeBtn.hidden = true;
+        }
+    }
+
+    function enterPseudoFullscreen() {
+        wrap.classList.add("reader-frame-wrap--pseudo-fs");
+        document.body.classList.add("reader-fs-pseudo-active");
+        if (closeBtn) {
+            closeBtn.hidden = false;
+        }
+    }
+
+    async function exitApiFullscreen() {
+        if (document.exitFullscreen) {
+            await document.exitFullscreen().catch(() => {});
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
+
     const syncLabel = () => {
-        const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-        if (fsEl) {
+        const on = isAnyFullscreen();
+        if (on) {
             btn.textContent = "⛶ Выйти из полного экрана";
             btn.title = "Выйти из полноэкранного режима";
         } else {
             btn.textContent = "⛶ Полный экран";
-            btn.title = "Развернуть PDF на весь экран";
+            btn.title = isMobileReader()
+                ? "На весь экран (без ограничений Safari)"
+                : "Развернуть область чтения";
+        }
+        if (closeBtn) {
+            closeBtn.hidden = !isPseudoFullscreen();
         }
     };
 
     btn.addEventListener("click", async () => {
-        const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+        if (isAnyFullscreen()) {
+            await exitApiFullscreen();
+            exitPseudoFullscreen();
+            syncLabel();
+            scheduleResizeRerender();
+            return;
+        }
+
+        if (isMobileReader() || !wrap.requestFullscreen) {
+            enterPseudoFullscreen();
+            syncLabel();
+            scheduleResizeRerender();
+            return;
+        }
+
         try {
-            if (!fsEl) {
-                if (wrap.requestFullscreen) {
-                    await wrap.requestFullscreen();
-                } else if (wrap.webkitRequestFullscreen) {
-                    wrap.webkitRequestFullscreen();
-                }
-            } else if (document.exitFullscreen) {
-                await document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
+            if (wrap.requestFullscreen) {
+                await wrap.requestFullscreen();
+            } else if (wrap.webkitRequestFullscreen) {
+                wrap.webkitRequestFullscreen();
+            } else {
+                throw new Error("no-fs");
             }
-        } catch (err) {
-            console.warn(err);
+        } catch {
+            enterPseudoFullscreen();
         }
         syncLabel();
+        scheduleResizeRerender();
     });
 
-    document.addEventListener("fullscreenchange", syncLabel);
-    document.addEventListener("webkitfullscreenchange", syncLabel);
+    closeBtn?.addEventListener("click", () => {
+        exitPseudoFullscreen();
+        exitApiFullscreen().catch(() => {});
+        syncLabel();
+        scheduleResizeRerender();
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+        syncLabel();
+        scheduleResizeRerender();
+    });
+    document.addEventListener("webkitfullscreenchange", () => {
+        syncLabel();
+        scheduleResizeRerender();
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") {
+            return;
+        }
+        if (!isAnyFullscreen()) {
+            return;
+        }
+        exitApiFullscreen().catch(() => {});
+        exitPseudoFullscreen();
+        syncLabel();
+        scheduleResizeRerender();
+    });
+
     syncLabel();
+}
+
+function initReaderSeriesNav() {
+    const nav = document.getElementById("reader-series-bar");
+    if (!nav || !readerState.book) {
+        return;
+    }
+    const sid = readerState.book.seriesId;
+    if (!sid) {
+        nav.hidden = true;
+        nav.innerHTML = "";
+        return;
+    }
+    const siblings = books
+        .filter((b) => b.seriesId === sid)
+        .sort((a, b) => (a.seriesOrder || 0) - (b.seriesOrder || 0));
+    if (siblings.length < 2) {
+        nav.hidden = true;
+        nav.innerHTML = "";
+        return;
+    }
+    const st = readerState.book.seriesTitle || "Серия";
+    const items = siblings
+        .map((b) => {
+            const active = b.id === readerState.book.id;
+            const href = `reader.html?book=${encodeURIComponent(b.id)}`;
+            return `<li${active ? ' class="is-current"' : ""}><a href="${href}">${escapeHtml(
+                b.title
+            )}</a></li>`;
+        })
+        .join("");
+    nav.innerHTML = `<p class="reader-series-title">${escapeHtml(st)}</p><ul class="reader-series-list">${items}</ul>`;
+    nav.hidden = false;
 }
 
 function renderReader() {
@@ -619,11 +918,13 @@ function renderReader() {
 
     applyReaderLayout();
     initReaderRatingUi();
+    initReaderSeriesNav();
     bindFullscreenControls();
 
     window.addEventListener("resize", onReaderViewportChange);
     window.addEventListener("orientationchange", onReaderViewportChange);
 }
 
+bindLibraryFilters();
 renderLibrary();
 renderReader();
