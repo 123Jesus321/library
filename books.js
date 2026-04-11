@@ -85,13 +85,19 @@ const books = [
 const BG_THEME_STORAGE_KEY = "knigi-bg-theme-v1";
 
 const BG_THEMES = [
-    { id: "crimson-violet", label: "Красно-фиолетовый" },
-    { id: "blue-violet", label: "Сине-фиолетовый" },
-    { id: "gold-crimson", label: "Золотисто-красный" },
-    { id: "red-black", label: "Красно-чёрный" },
-    { id: "emerald-abyss", label: "Изумрудная ночь" },
-    { id: "sunset-orchid", label: "Закат и орхидея" },
-    { id: "arctic-plum", label: "Ледяная слива" }
+    { id: "crimson-violet", label: "Бархатная полночь" },
+    { id: "blue-violet", label: "Лазурный рубеж" },
+    { id: "gold-crimson", label: "Янтарный костёр" },
+    { id: "red-black", label: "Инферно" },
+    { id: "emerald-abyss", label: "Светящаяся бездна" },
+    { id: "sunset-orchid", label: "Неоновый закат" },
+    { id: "arctic-plum", label: "Полярная ночь" },
+    { id: "obsidian-cyan", label: "Ледяной неон" },
+    { id: "copper-dusk", label: "Медное стекло" },
+    { id: "slate-rose", label: "Пепел и роза" },
+    { id: "noir-lime", label: "Токсичный лайм" },
+    { id: "velvet-sapphire", label: "Сапфир в бархате" },
+    { id: "void-lavender", label: "Лавандовая пустота" }
 ];
 
 function applyBgTheme(themeId) {

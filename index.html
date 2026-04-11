@@ -7,18 +7,15 @@
     <link rel="stylesheet" href="books.css">
 </head>
 <body>
-    <div class="bg-theme-float" aria-label="Тема оформления">
-        <label class="bg-theme-picker">
-            <span class="bg-theme-label">Фон</span>
-            <select id="bg-theme-select" class="bg-theme-select" title="Градиент фона страницы"></select>
-        </label>
-    </div>
     <main class="library-page">
         <section class="hero">
             <p class="hero-kicker">Электронная библиотека</p>
             <h1>Выберите книгу и начните чтение</h1>
             <p class="hero-subtitle">
                 Фильтры по автору, названию, серии и дате обновления. На телефоне «Полный экран» разворачивает страницу без системного API (работает в Safari). Оценки хранятся в браузере.
+            </p>
+            <p class="hero-settings-link">
+                <a class="header-settings-btn" href="settings.html">⚙ Настройки оформления</a>
             </p>
         </section>
 
@@ -58,11 +55,12 @@
 
     <aside class="library-chat" id="library-chat" aria-label="Общий чат">
         <button type="button" class="library-chat-toggle" id="library-chat-toggle" aria-expanded="false" aria-controls="library-chat-panel">
-            💬 Общий чат
+            💬 Открыть чат
         </button>
         <div class="library-chat-panel" id="library-chat-panel" hidden>
             <div class="library-chat-head">
                 <span class="library-chat-title">Сообщения видят все читатели</span>
+                <button type="button" class="library-chat-close" id="library-chat-close" hidden aria-label="Закрыть чат">✕</button>
             </div>
             <ul class="library-chat-messages" id="library-chat-messages"></ul>
             <form class="library-chat-form" id="library-chat-form" autocomplete="off">
@@ -76,6 +74,7 @@
         </div>
     </aside>
 
+    <script src="wave-lines.js"></script>
     <script src="chat-config.js"></script>
     <script src="chat.js"></script>
     <script src="books.js"></script>

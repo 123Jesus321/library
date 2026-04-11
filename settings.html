@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Настройки — библиотека</title>
+    <link rel="stylesheet" href="books.css">
+</head>
+<body>
+    <main class="library-page settings-page">
+        <p class="settings-back-wrap">
+            <a class="back-btn" href="index.html">← К каталогу</a>
+        </p>
+        <section class="settings-card" aria-labelledby="settings-appearance-title">
+            <h1 id="settings-appearance-title" class="settings-card-title">Оформление</h1>
+            <p class="settings-card-lead">Фон страниц библиотеки и читалки сохраняется в этом браузере.</p>
+            <label class="settings-field">
+                <span class="settings-field-label">Градиент фона</span>
+                <select id="bg-theme-select" class="bg-theme-select settings-theme-select" title="Градиент фона страницы"></select>
+            </label>
+            <div class="settings-field settings-field--range">
+                <span class="settings-field-label" id="wave-speed-heading">Скорость волны линий</span>
+                <p class="settings-range-hint" id="wave-speed-hint">Белые линии на фоне изгибаются каждая по-своему; здесь задаётся, как быстро они «плывут».</p>
+                <div class="settings-range-row">
+                    <input type="range" id="wave-speed-range" class="settings-range-input" min="1" max="100" value="24" step="1" aria-labelledby="wave-speed-heading" aria-describedby="wave-speed-hint wave-speed-label">
+                    <span class="settings-range-value" id="wave-speed-label" aria-live="polite">24%</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <aside class="library-chat" id="library-chat" aria-label="Общий чат">
+        <button type="button" class="library-chat-toggle" id="library-chat-toggle" aria-expanded="false" aria-controls="library-chat-panel">
+            💬 Открыть чат
+        </button>
+        <div class="library-chat-panel" id="library-chat-panel" hidden>
+            <div class="library-chat-head">
+                <span class="library-chat-title">Сообщения видят все читатели</span>
+                <button type="button" class="library-chat-close" id="library-chat-close" hidden aria-label="Закрыть чат">✕</button>
+            </div>
+            <ul class="library-chat-messages" id="library-chat-messages"></ul>
+            <form class="library-chat-form" id="library-chat-form" autocomplete="off">
+                <input type="text" id="library-chat-nick" class="library-chat-nick" placeholder="Имя" maxlength="32" aria-label="Имя">
+                <div class="library-chat-row">
+                    <input type="text" id="library-chat-input" class="library-chat-input" placeholder="Сообщение…" maxlength="500" required aria-label="Текст сообщения">
+                    <button type="submit" class="library-chat-send">Отправить</button>
+                </div>
+            </form>
+            <p class="library-chat-status" id="library-chat-status" hidden></p>
+        </div>
+    </aside>
+
+    <script src="wave-lines.js"></script>
+    <script src="chat-config.js"></script>
+    <script src="chat.js"></script>
+    <script src="books.js"></script>
+</body>
+</html>

@@ -11,6 +11,7 @@
 
     const panel = document.getElementById("library-chat-panel");
     const toggle = document.getElementById("library-chat-toggle");
+    const closeBtn = document.getElementById("library-chat-close");
     const listEl = document.getElementById("library-chat-messages");
     const form = document.getElementById("library-chat-form");
     const input = document.getElementById("library-chat-input");
@@ -135,14 +136,43 @@
         }, 4000);
     }
 
+    function syncChatToggleUi(isOpen) {
+        if (!toggle) {
+            return;
+        }
+        toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        toggle.textContent = isOpen ? "✕ Закрыть чат" : "💬 Открыть чат";
+        toggle.setAttribute("aria-label", isOpen ? "Закрыть общий чат" : "Открыть общий чат");
+        if (closeBtn) {
+            closeBtn.hidden = !isOpen;
+        }
+    }
+
+    function setChatOpen(open) {
+        if (!panel || !toggle) {
+            return;
+        }
+        panel.hidden = !open;
+        syncChatToggleUi(open);
+        if (open && configured) {
+            fetchMessages().catch(() => {});
+        }
+    }
+
     if (toggle && panel) {
-        toggle.addEventListener("click", () => {
-            const open = panel.hidden;
-            panel.hidden = !open;
-            toggle.setAttribute("aria-expanded", open ? "true" : "false");
-            if (open && configured) {
-                fetchMessages().catch(() => {});
-            }
+        syncChatToggleUi(!panel.hidden);
+        toggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setChatOpen(!!panel.hidden);
+        });
+    }
+
+    if (closeBtn && panel && toggle) {
+        closeBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setChatOpen(false);
         });
     }
 
