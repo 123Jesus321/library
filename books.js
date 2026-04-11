@@ -48,7 +48,6 @@ const books = [
         pdf: "Сборник-Стихов.pdf"
     }];
 
-const MOBILE_MAX_WIDTH = 640;
 const PDFJS_CDN = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
 const PDFJS_WORKER = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
@@ -71,10 +70,6 @@ function renderLibrary() {
         `
         )
         .join("");
-}
-
-function isMobileReader() {
-    return window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH}px)`).matches;
 }
 
 function isPdfFile(url) {
@@ -112,7 +107,7 @@ let readerState = {
     swipeX: null,
     pagerBound: false,
     resizeTimer: null,
-    lastMobileLayout: null
+    keyBound: false
 };
 
 function getReaderEls() {
@@ -301,10 +296,25 @@ function bindPdfPagerOnce() {
             { passive: true }
         );
     }
+    if (!readerState.keyBound) {
+        window.addEventListener("keydown", (e) => {
+            if (!readerState.pdfDoc) {
+                return;
+            }
+            if (e.key === "ArrowLeft" || e.key === "PageUp") {
+                e.preventDefault();
+                goPdfPage(-1);
+            } else if (e.key === "ArrowRight" || e.key === "PageDown") {
+                e.preventDefault();
+                goPdfPage(1);
+            }
+        });
+        readerState.keyBound = true;
+    }
     readerState.pagerBound = true;
 }
 
-async function startMobilePdf(url) {
+async function startPdfWithJs(url) {
     const token = ++readerState.loadToken;
     bindPdfPagerOnce();
     clearPdfError();
@@ -369,7 +379,8 @@ function applyIframeMode(url) {
     }
 }
 
-function applyMobilePdfMode(url) {
+/** PDF через canvas на всех устройствах: iframe на ПК часто пустой (file://, политики браузера). */
+function applyPdfCanvasMode(url) {
     const { frame, pdfView, wrap } = getReaderEls();
     if (frame) {
         frame.style.display = "none";
@@ -381,7 +392,7 @@ function applyMobilePdfMode(url) {
     if (wrap) {
         wrap.classList.add("reader-frame-wrap--canvas");
     }
-    startMobilePdf(url).catch(() => {
+    startPdfWithJs(url).catch(() => {
         applyIframeMode(url);
     });
 }
@@ -395,17 +406,16 @@ function applyReaderLayout() {
 
     title.textContent = `${book.title} — ${book.author}`;
     const url = book.pdf;
-    const mobile = isMobileReader();
 
-    if (mobile && isPdfFile(url)) {
-        applyMobilePdfMode(url);
+    if (isPdfFile(url)) {
+        applyPdfCanvasMode(url);
     } else {
         applyIframeMode(url);
     }
 }
 
 function scheduleResizeRerender() {
-    if (!readerState.book || !readerState.pdfDoc || !isMobileReader() || !isPdfFile(readerState.book.pdf)) {
+    if (!readerState.book || !readerState.pdfDoc || !isPdfFile(readerState.book.pdf)) {
         return;
     }
     clearTimeout(readerState.resizeTimer);
@@ -418,13 +428,6 @@ function onReaderViewportChange() {
     if (!readerState.book) {
         return;
     }
-    const mobile = isMobileReader();
-    if (readerState.lastMobileLayout !== null && mobile !== readerState.lastMobileLayout) {
-        readerState.lastMobileLayout = mobile;
-        applyReaderLayout();
-        return;
-    }
-    readerState.lastMobileLayout = mobile;
     scheduleResizeRerender();
 }
 
@@ -437,7 +440,6 @@ function renderReader() {
     const params = new URLSearchParams(window.location.search);
     const bookId = params.get("book");
     readerState.book = books.find((b) => b.id === bookId) || books[0];
-    readerState.lastMobileLayout = isMobileReader();
 
     applyReaderLayout();
 
