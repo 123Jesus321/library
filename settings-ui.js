@@ -50,6 +50,8 @@
     let lastT = 0;
     let particlesState = null;
 
+    const LINES_COUNT = 15;
+
     function resizeCanvas(canvas) {
         const dpr = window.devicePixelRatio || 1;
         const w = window.innerWidth;
@@ -88,7 +90,7 @@
             const diag = Math.hypot(w, h);
             return {
                 mode,
-                items: Array.from({ length: 52 }, () => {
+                items: Array.from({ length: LINES_COUNT }, () => {
                     const halfLen = diag * (0.7 + Math.random() * 0.65);
                     return {
                         cx: (Math.random() - 0.15) * (w * 1.3),
@@ -143,7 +145,11 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.scale(dpr, dpr);
 
-        if (!particlesState || particlesState.mode !== settings.particleMode) {
+        if (
+            !particlesState ||
+            particlesState.mode !== settings.particleMode ||
+            (settings.particleMode === "lines" && particlesState.items.length !== LINES_COUNT)
+        ) {
             particlesState = initParticlesState(w, h, settings.particleMode);
         }
         if (!particlesState) {
@@ -180,43 +186,48 @@
             ctx.lineWidth = 1.65;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
-            /*
-             * Кубическая Безье: контрольные точки смещены вдоль общей нормали — только изгиб, без вращения линий.
-             * Угол ln.ang фиксирован после инициализации.
-             */
+            ctx.strokeStyle = "rgba(255,255,255,0.65)";
             const tWave = time * 1.06;
-            /* Почти на всю меньшую сторону экрана; k ограничен долей хорды — максимальный изгиб без петель на кривой. */
             const baseAmp = Math.min(w, h) * 0.96 * sf;
             const bend = Math.sin(tWave) * baseAmp + Math.cos(tWave * 0.68) * baseAmp * 0.55;
-            const alphaWave = 0.22 + Math.sin(tWave) * 0.1;
-            particlesState.items.forEach((ln) => {
+            const bendK = bend * 6.05;
+            ctx.globalAlpha = 0.22 + Math.sin(tWave) * 0.1;
+            const items = particlesState.items;
+            ctx.beginPath();
+            for (let i = 0; i < items.length; i += 1) {
+                const ln = items[i];
                 const c = Math.cos(ln.ang);
                 const s = Math.sin(ln.ang);
                 const nx = -s;
                 const ny = c;
-                const x1 = ln.cx - c * ln.halfLen;
-                const y1 = ln.cy - s * ln.halfLen;
-                const x2 = ln.cx + c * ln.halfLen;
-                const y2 = ln.cy + s * ln.halfLen;
-                const chord = 2 * ln.halfLen;
-                let k = bend * 6.05;
+                const hl = ln.halfLen;
+                const chord = hl + hl;
+                let k = bendK;
                 const kMax = chord * 0.48;
-                if (Math.abs(k) > kMax) {
-                    k = Math.sign(k) * kMax;
+                if (k > kMax) {
+                    k = kMax;
+                } else if (k < -kMax) {
+                    k = -kMax;
                 }
-                const c1x = x1 + c * (chord / 3) + nx * k;
-                const c1y = y1 + s * (chord / 3) + ny * k;
-                const c2x = x1 + c * ((2 * chord) / 3) + nx * k;
-                const c2y = y1 + s * ((2 * chord) / 3) + ny * k;
-                ctx.globalAlpha = alphaWave;
-                ctx.strokeStyle = "rgba(255,255,255,0.65)";
-                ctx.beginPath();
+                const t = chord / 3;
+                const t2 = t + t;
+                const x1 = ln.cx - c * hl;
+                const y1 = ln.cy - s * hl;
+                const x2 = ln.cx + c * hl;
+                const y2 = ln.cy + s * hl;
                 ctx.moveTo(x1, y1);
-                ctx.bezierCurveTo(c1x, c1y, c2x, c2y, x2, y2);
-                ctx.stroke();
-                ctx.globalAlpha = 0.35;
-                ctx.strokeStyle = "rgba(255,255,255,0.55)";
-            });
+                ctx.bezierCurveTo(
+                    x1 + c * t + nx * k,
+                    y1 + s * t + ny * k,
+                    x1 + c * t2 + nx * k,
+                    y1 + s * t2 + ny * k,
+                    x2,
+                    y2
+                );
+            }
+            ctx.stroke();
+            ctx.globalAlpha = 0.35;
+            ctx.strokeStyle = "rgba(255,255,255,0.55)";
         } else if (particlesState.mode === "stars") {
             particlesState.items.forEach((st) => {
                 const pulse = 0.6 + Math.sin(time * st.spd + st.tw) * 0.4;
