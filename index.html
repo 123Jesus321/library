@@ -38,6 +38,13 @@
                     <label class="settings-radio"><input type="radio" name="settings-particle-mode" value="lines"> <span>Линии</span></label>
                     <label class="settings-radio"><input type="radio" name="settings-particle-mode" value="stars"> <span>Звёздочки</span></label>
                 </fieldset>
+                <div class="settings-field" id="settings-lines-count-wrap" hidden>
+                    <div class="settings-label-row">
+                        <span class="settings-label">Количество линий</span>
+                        <span class="settings-speed-val" id="settings-particle-lines-val">7</span>
+                    </div>
+                    <input type="range" id="settings-particle-lines" class="settings-range" min="1" max="40" value="7" aria-label="Количество линий на фоне">
+                </div>
                 <div class="settings-field">
                     <div class="settings-label-row">
                         <span class="settings-label">Скорость движения</span>

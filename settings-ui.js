@@ -6,7 +6,8 @@
         bgTheme: "crimson-violet",
         gradientShimmer: true,
         particleMode: "none",
-        particleSpeed: 45
+        particleSpeed: 45,
+        particleLinesCount: 7
     });
 
     function loadSettings() {
@@ -28,6 +29,7 @@
             s.particleMode = "none";
         }
         s.particleSpeed = Math.max(5, Math.min(100, Number(s.particleSpeed) || 45));
+        s.particleLinesCount = Math.max(1, Math.min(40, Number(s.particleLinesCount) || 7));
         return s;
     }
 
@@ -50,8 +52,6 @@
     let lastT = 0;
     let particlesState = null;
 
-    const LINES_COUNT = 15;
-
     function resizeCanvas(canvas) {
         const dpr = window.devicePixelRatio || 1;
         const w = window.innerWidth;
@@ -73,7 +73,7 @@
         return resizeCanvas(canvas);
     }
 
-    function initParticlesState(w, h, mode) {
+    function initParticlesState(w, h, mode, particleLinesCount) {
         if (mode === "circles") {
             return {
                 mode,
@@ -88,9 +88,10 @@
         }
         if (mode === "lines") {
             const diag = Math.hypot(w, h);
+            const n = Math.max(1, Math.min(40, Number(particleLinesCount) || 7));
             return {
                 mode,
-                items: Array.from({ length: LINES_COUNT }, () => {
+                items: Array.from({ length: n }, () => {
                     const halfLen = diag * (0.7 + Math.random() * 0.65);
                     return {
                         cx: (Math.random() - 0.15) * (w * 1.3),
@@ -145,12 +146,16 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.scale(dpr, dpr);
 
+        const linesN =
+            settings.particleMode === "lines"
+                ? Math.max(1, Math.min(40, Number(settings.particleLinesCount) || 7))
+                : 0;
         if (
             !particlesState ||
             particlesState.mode !== settings.particleMode ||
-            (settings.particleMode === "lines" && particlesState.items.length !== LINES_COUNT)
+            (settings.particleMode === "lines" && particlesState.items.length !== linesN)
         ) {
-            particlesState = initParticlesState(w, h, settings.particleMode);
+            particlesState = initParticlesState(w, h, settings.particleMode, settings.particleLinesCount);
         }
         if (!particlesState) {
             return;
@@ -283,11 +288,21 @@
         el.style.animationDuration = `${Math.max(6, 22 - (sp / 100) * 10)}s`;
     }
 
+    function syncLinesCountRowVisibility() {
+        const wrap = document.getElementById("settings-lines-count-wrap");
+        const linesRadio = document.querySelector('input[name="settings-particle-mode"][value="lines"]');
+        if (wrap) {
+            wrap.hidden = !(linesRadio && linesRadio.checked);
+        }
+    }
+
     function syncFormFromSettings(s) {
         const themeSel = document.getElementById("settings-bg-theme");
         const gradCb = document.getElementById("settings-gradient-shimmer");
         const speedRange = document.getElementById("settings-particle-speed");
         const speedVal = document.getElementById("settings-particle-speed-val");
+        const linesRange = document.getElementById("settings-particle-lines");
+        const linesVal = document.getElementById("settings-particle-lines-val");
         if (themeSel) {
             themeSel.value = s.bgTheme;
         }
@@ -300,26 +315,36 @@
         if (speedVal) {
             speedVal.textContent = String(s.particleSpeed);
         }
+        if (linesRange) {
+            linesRange.value = String(s.particleLinesCount);
+        }
+        if (linesVal) {
+            linesVal.textContent = String(s.particleLinesCount);
+        }
         document.querySelectorAll('input[name="settings-particle-mode"]').forEach((inp) => {
             inp.checked = inp.value === s.particleMode;
         });
+        syncLinesCountRowVisibility();
     }
 
     function gatherFormSettings() {
         const themeSel = document.getElementById("settings-bg-theme");
         const gradCb = document.getElementById("settings-gradient-shimmer");
         const speedRange = document.getElementById("settings-particle-speed");
+        const linesRange = document.getElementById("settings-particle-lines");
         let particleMode = "none";
         document.querySelectorAll('input[name="settings-particle-mode"]').forEach((inp) => {
             if (inp.checked) {
                 particleMode = inp.value;
             }
         });
+        const rawLines = linesRange ? Number(linesRange.value) : 7;
         return {
             bgTheme: themeSel ? themeSel.value : "crimson-violet",
             gradientShimmer: gradCb ? gradCb.checked : true,
             particleMode,
-            particleSpeed: speedRange ? Number(speedRange.value) : 45
+            particleSpeed: speedRange ? Number(speedRange.value) : 45,
+            particleLinesCount: Math.max(1, Math.min(40, Number.isFinite(rawLines) ? rawLines : 7))
         };
     }
 
@@ -367,6 +392,8 @@
         const gradCb = document.getElementById("settings-gradient-shimmer");
         const speedRange = document.getElementById("settings-particle-speed");
         const speedVal = document.getElementById("settings-particle-speed-val");
+        const linesRange = document.getElementById("settings-particle-lines");
+        const linesVal = document.getElementById("settings-particle-lines-val");
 
         if (themeSel && window.KnigiBG_THEMES) {
             themeSel.innerHTML = "";
@@ -414,8 +441,17 @@
             }
             persistFromForm();
         });
+        linesRange?.addEventListener("input", () => {
+            if (linesVal) {
+                linesVal.textContent = linesRange.value;
+            }
+            persistFromForm();
+        });
         document.querySelectorAll('input[name="settings-particle-mode"]').forEach((inp) => {
-            inp.addEventListener("change", persistFromForm);
+            inp.addEventListener("change", () => {
+                syncLinesCountRowVisibility();
+                persistFromForm();
+            });
         });
 
         document.addEventListener("keydown", (e) => {
