@@ -51,25 +51,127 @@ const books = [
 const PDFJS_CDN = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
 const PDFJS_WORKER = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
+const RATING_STORAGE_KEY = "knigi-book-ratings-v1";
+
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+function escapeAttr(str) {
+    return String(str).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+}
+
+function loadRatings() {
+    try {
+        const raw = localStorage.getItem(RATING_STORAGE_KEY);
+        if (!raw) {
+            return {};
+        }
+        const o = JSON.parse(raw);
+        return typeof o === "object" && o !== null ? o : {};
+    } catch {
+        return {};
+    }
+}
+
+function saveRatings(obj) {
+    try {
+        localStorage.setItem(RATING_STORAGE_KEY, JSON.stringify(obj));
+    } catch {
+        /* ignore */
+    }
+}
+
+function getBookRating(bookId) {
+    const n = Number(loadRatings()[bookId]);
+    if (n >= 1 && n <= 5) {
+        return n;
+    }
+    return 0;
+}
+
+function setBookRating(bookId, stars) {
+    const all = loadRatings();
+    all[bookId] = Math.max(1, Math.min(5, Math.round(Number(stars))));
+    saveRatings(all);
+}
+
+function renderStarButtons(bookId, current, idPrefix) {
+    let html = "";
+    for (let v = 1; v <= 5; v += 1) {
+        const on = v <= current ? " is-on" : "";
+        html += `<button type="button" class="star-btn${on}" data-book-id="${escapeAttr(
+            bookId
+        )}" data-value="${v}" aria-label="${v} из 5" id="${idPrefix}-star-${v}">★</button>`;
+    }
+    return html;
+}
+
+let libraryRatingGridBound = false;
+
+function bindLibraryRatingGrid() {
+    const grid = document.getElementById("book-grid");
+    if (!grid || libraryRatingGridBound) {
+        return;
+    }
+    libraryRatingGridBound = true;
+    grid.addEventListener("click", (e) => {
+        const btn = e.target.closest(".star-btn");
+        if (!btn || !grid.contains(btn)) {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        const bookId = btn.getAttribute("data-book-id");
+        const value = Number(btn.dataset.value);
+        if (!bookId || value < 1 || value > 5) {
+            return;
+        }
+        setBookRating(bookId, value);
+        renderLibrary();
+    });
+}
+
 function renderLibrary() {
     const grid = document.getElementById("book-grid");
-    if (!grid) return;
+    if (!grid) {
+        return;
+    }
 
     grid.innerHTML = books
-        .map(
-            (book) => `
-            <a class="book-card" href="reader.html?book=${encodeURIComponent(book.id)}">
-                <div class="book-cover">
-                    <span>${book.title}<br>${book.author}</span>
+        .map((book, idx) => {
+            const rating = getBookRating(book.id);
+            const href = `reader.html?book=${encodeURIComponent(book.id)}`;
+            const prefix = `lib-${idx}`;
+            return `
+            <article class="book-tile" data-book-id="${escapeAttr(book.id)}">
+                <a class="book-card" href="${href}">
+                    <div class="book-cover">
+                        <span>${escapeHtml(book.title)}<br>${escapeHtml(book.author)}</span>
+                    </div>
+                    <div class="book-info">
+                        <h2>${escapeHtml(book.title)}</h2>
+                        <p>${escapeHtml(book.author)}</p>
+                    </div>
+                </a>
+                <div class="book-rating-bar">
+                    <span>Оценка:</span>
+                    <div class="star-rating" role="group" aria-label="Оценка книги «${escapeHtml(
+                        book.title
+                    )}»">
+                        ${renderStarButtons(book.id, rating, prefix)}
+                    </div>
                 </div>
-                <div class="book-info">
-                    <h2>${book.title}</h2>
-                    <p>${book.author}</p>
-                </div>
-            </a>
-        `
-        )
+            </article>
+        `;
+        })
         .join("");
+
+    bindLibraryRatingGrid();
 }
 
 function isPdfFile(url) {
@@ -107,7 +209,9 @@ let readerState = {
     swipeX: null,
     pagerBound: false,
     resizeTimer: null,
-    keyBound: false
+    keyBound: false,
+    fullscreenBound: false,
+    readerRatingBound: false
 };
 
 function getReaderEls() {
@@ -431,6 +535,78 @@ function onReaderViewportChange() {
     scheduleResizeRerender();
 }
 
+function initReaderRatingUi() {
+    const row = document.getElementById("reader-rating-row");
+    const container = document.getElementById("reader-star-rating");
+    if (!row || !container || !readerState.book || readerState.readerRatingBound) {
+        return;
+    }
+    readerState.readerRatingBound = true;
+
+    const paint = () => {
+        const r = getBookRating(readerState.book.id);
+        container.innerHTML = renderStarButtons(readerState.book.id, r, "reader");
+        container.querySelectorAll(".star-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const v = Number(btn.dataset.value);
+                setBookRating(readerState.book.id, v);
+                paint();
+                const grid = document.getElementById("book-grid");
+                if (grid) {
+                    renderLibrary();
+                }
+            });
+        });
+    };
+
+    row.hidden = false;
+    paint();
+}
+
+function bindFullscreenControls() {
+    const btn = document.getElementById("reader-fullscreen-btn");
+    const wrap = document.getElementById("reader-frame-wrap");
+    if (!btn || !wrap || readerState.fullscreenBound) {
+        return;
+    }
+    readerState.fullscreenBound = true;
+
+    const syncLabel = () => {
+        const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+        if (fsEl) {
+            btn.textContent = "⛶ Выйти из полного экрана";
+            btn.title = "Выйти из полноэкранного режима";
+        } else {
+            btn.textContent = "⛶ Полный экран";
+            btn.title = "Развернуть PDF на весь экран";
+        }
+    };
+
+    btn.addEventListener("click", async () => {
+        const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+        try {
+            if (!fsEl) {
+                if (wrap.requestFullscreen) {
+                    await wrap.requestFullscreen();
+                } else if (wrap.webkitRequestFullscreen) {
+                    wrap.webkitRequestFullscreen();
+                }
+            } else if (document.exitFullscreen) {
+                await document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        } catch (err) {
+            console.warn(err);
+        }
+        syncLabel();
+    });
+
+    document.addEventListener("fullscreenchange", syncLabel);
+    document.addEventListener("webkitfullscreenchange", syncLabel);
+    syncLabel();
+}
+
 function renderReader() {
     const { title } = getReaderEls();
     if (!title) {
@@ -442,6 +618,8 @@ function renderReader() {
     readerState.book = books.find((b) => b.id === bookId) || books[0];
 
     applyReaderLayout();
+    initReaderRatingUi();
+    bindFullscreenControls();
 
     window.addEventListener("resize", onReaderViewportChange);
     window.addEventListener("orientationchange", onReaderViewportChange);

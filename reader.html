@@ -6,13 +6,22 @@
     <title>Чтение книги</title>
     <link rel="stylesheet" href="books.css">
 </head>
-<body>
+<body class="reader-body">
     <main class="reader-page">
         <header class="reader-header">
-            <a class="back-btn" href="index.html">← К выбору книг</a>
+            <div class="reader-header-row">
+                <a class="back-btn" href="index.html">← К выбору книг</a>
+                <button type="button" class="fullscreen-btn" id="reader-fullscreen-btn" title="На весь экран">
+                    ⛶ Полный экран
+                </button>
+            </div>
             <div class="reader-book-meta">
                 <p class="reader-label">Сейчас открыта книга</p>
-                <h1 id="reader-title">Загрузка...</h1>
+                <h1 id="reader-title">Загрузка…</h1>
+            </div>
+            <div class="reader-rating-row" id="reader-rating-row" hidden>
+                <span class="reader-rating-label">Ваша оценка:</span>
+                <div class="star-rating" id="reader-star-rating" role="group" aria-label="Оценка книги"></div>
             </div>
         </header>
 
