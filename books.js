@@ -16,9 +16,9 @@ const books = [
         author: "Конфетки Миллер",
         pdf: "Зеронтар-_1_.pdf",
         seriesId: "miller-azantir",
-        seriesTitle: "Мир Азантира",
+        seriesTitle: "Хроники Террианы",
         seriesOrder: 1,
-        updatedAt: "2026-01-20"
+        updatedAt: "2026-03-16"
     },
     {
         id: "Азантир-и-его-устройство-_2_",
@@ -26,9 +26,9 @@ const books = [
         author: "Конфетки Миллер",
         pdf: "Азантир-и-его-устройство-_2_.pdf",
         seriesId: "miller-azantir",
-        seriesTitle: "Мир Азантира",
+        seriesTitle: "Хроники Террианы",
         seriesOrder: 2,
-        updatedAt: "2026-02-03"
+        updatedAt: "2026-03-15"
     },
     {
         id: "Битва-за-Азантир-_1_",
@@ -36,9 +36,9 @@ const books = [
         author: "Конфетки Миллер",
         pdf: "Битва-за-Азантир-_1_.pdf",
         seriesId: "miller-azantir",
-        seriesTitle: "Мир Азантира",
+        seriesTitle: "Хроники Террианы",
         seriesOrder: 3,
-        updatedAt: "2026-02-18"
+        updatedAt: "2026-03-19"
     },
     {
         id: "Сотворение",
@@ -46,9 +46,9 @@ const books = [
         author: "Конфетки Миллер",
         pdf: "Сотворение.pdf",
         seriesId: "miller-azantir",
-        seriesTitle: "Мир Азантира",
+        seriesTitle: "Хроники Террианы",
         seriesOrder: 4,
-        updatedAt: "2026-03-01"
+        updatedAt: "2026-03-22"
     },
     {
         id: "Cetus",
@@ -81,6 +81,55 @@ const books = [
         updatedAt: "2025-12-22"
     }
 ];
+
+const BG_THEME_STORAGE_KEY = "knigi-bg-theme-v1";
+
+const BG_THEMES = [
+    { id: "crimson-violet", label: "Красно-фиолетовый" },
+    { id: "blue-violet", label: "Сине-фиолетовый" },
+    { id: "gold-crimson", label: "Золотисто-красный" },
+    { id: "red-black", label: "Красно-чёрный" },
+    { id: "emerald-abyss", label: "Изумрудная ночь" },
+    { id: "sunset-orchid", label: "Закат и орхидея" },
+    { id: "arctic-plum", label: "Ледяная слива" }
+];
+
+function applyBgTheme(themeId) {
+    const valid = BG_THEMES.some((t) => t.id === themeId);
+    const id = valid ? themeId : "crimson-violet";
+    document.body.dataset.bgTheme = id;
+    try {
+        localStorage.setItem(BG_THEME_STORAGE_KEY, id);
+    } catch {
+        /* ignore */
+    }
+    const sel = document.getElementById("bg-theme-select");
+    if (sel) {
+        sel.value = id;
+    }
+}
+
+function initBgThemeSwitcher() {
+    let saved = null;
+    try {
+        saved = localStorage.getItem(BG_THEME_STORAGE_KEY);
+    } catch {
+        saved = null;
+    }
+    const initial = saved && BG_THEMES.some((t) => t.id === saved) ? saved : "crimson-violet";
+
+    const sel = document.getElementById("bg-theme-select");
+    if (sel) {
+        BG_THEMES.forEach((t) => {
+            const o = document.createElement("option");
+            o.value = t.id;
+            o.textContent = t.label;
+            sel.appendChild(o);
+        });
+        sel.addEventListener("change", () => applyBgTheme(sel.value));
+    }
+    applyBgTheme(initial);
+}
 
 const PDFJS_CDN = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
 const PDFJS_WORKER = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -925,6 +974,7 @@ function renderReader() {
     window.addEventListener("orientationchange", onReaderViewportChange);
 }
 
+initBgThemeSwitcher();
 bindLibraryFilters();
 renderLibrary();
 renderReader();

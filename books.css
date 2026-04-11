@@ -1,8 +1,4 @@
 :root {
-    --bg-1: #1a0b2e;
-    --bg-2: #3d0f1f;
-    --bg-purple-glow: rgba(139, 92, 246, 0.22);
-    --bg-rose-glow: rgba(244, 63, 94, 0.18);
     --paper: #f8f4e3;
     --paper-dark: #eadfbe;
     --accent: #c6a15b;
@@ -20,20 +16,136 @@ body {
     color: var(--text-main);
     min-height: 100vh;
     min-height: 100dvh;
+    background-attachment: fixed;
+    background-color: #0f0618;
+}
+
+/* --- Темы фона (переключатель: data-bg-theme на body) --- */
+
+body[data-bg-theme="crimson-violet"] {
     background-color: #15081f;
     background-image:
-        radial-gradient(ellipse 120% 80% at 0% 0%, var(--bg-purple-glow), transparent 55%),
-        radial-gradient(ellipse 100% 70% at 100% 100%, var(--bg-rose-glow), transparent 50%),
+        radial-gradient(ellipse 120% 80% at 0% 0%, rgba(139, 92, 246, 0.22), transparent 55%),
+        radial-gradient(ellipse 100% 70% at 100% 100%, rgba(244, 63, 94, 0.18), transparent 50%),
         radial-gradient(circle at 50% 40%, rgba(167, 139, 250, 0.12), transparent 45%),
-        linear-gradient(
-            128deg,
-            #0f0618 0%,
-            #1e0f3a 22%,
-            #4c1030 52%,
-            #6b1a28 78%,
-            #2d0f24 100%
-        );
-    background-attachment: fixed;
+        linear-gradient(128deg, #0f0618 0%, #1e0f3a 22%, #4c1030 52%, #6b1a28 78%, #2d0f24 100%);
+}
+
+body[data-bg-theme="blue-violet"] {
+    background-color: #050e1e;
+    background-image:
+        radial-gradient(ellipse 110% 90% at 10% 0%, rgba(56, 189, 248, 0.2), transparent 55%),
+        radial-gradient(ellipse 90% 80% at 95% 100%, rgba(99, 102, 241, 0.22), transparent 52%),
+        radial-gradient(circle at 40% 60%, rgba(14, 165, 233, 0.1), transparent 42%),
+        linear-gradient(135deg, #020617 0%, #0c4a6e 28%, #312e81 58%, #1e1b4b 85%, #020617 100%);
+}
+
+body[data-bg-theme="gold-crimson"] {
+    background-color: #1a0a08;
+    background-image:
+        radial-gradient(ellipse 100% 75% at 15% 10%, rgba(251, 191, 36, 0.25), transparent 50%),
+        radial-gradient(ellipse 90% 70% at 90% 85%, rgba(220, 38, 38, 0.22), transparent 48%),
+        radial-gradient(circle at 55% 35%, rgba(245, 158, 11, 0.14), transparent 40%),
+        linear-gradient(145deg, #1c0707 0%, #422006 25%, #7f1d1d 55%, #450a0a 82%, #0c0404 100%);
+}
+
+body[data-bg-theme="red-black"] {
+    background-color: #000000;
+    background-image:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(185, 28, 28, 0.35), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 80% 100%, rgba(127, 29, 29, 0.2), transparent 50%),
+        linear-gradient(168deg, #000000 0%, #1c0508 35%, #450a0a 62%, #7f1d1d 82%, #000000 100%);
+}
+
+body[data-bg-theme="emerald-abyss"] {
+    background-color: #020f1a;
+    background-image:
+        radial-gradient(ellipse 100% 85% at 0% 100%, rgba(16, 185, 129, 0.18), transparent 55%),
+        radial-gradient(ellipse 90% 75% at 100% 0%, rgba(6, 182, 212, 0.14), transparent 50%),
+        radial-gradient(circle at 30% 30%, rgba(45, 212, 191, 0.08), transparent 45%),
+        linear-gradient(155deg, #020617 0%, #064e3b 32%, #022c22 58%, #0f172a 88%, #020617 100%);
+}
+
+body[data-bg-theme="sunset-orchid"] {
+    background-color: #1a0520;
+    background-image:
+        radial-gradient(ellipse 110% 80% at 0% 50%, rgba(244, 114, 182, 0.2), transparent 52%),
+        radial-gradient(ellipse 100% 70% at 100% 20%, rgba(251, 146, 60, 0.22), transparent 50%),
+        radial-gradient(circle at 60% 80%, rgba(192, 132, 252, 0.12), transparent 42%),
+        linear-gradient(125deg, #2e1065 0%, #831843 28%, #9f1239 52%, #4c1d95 78%, #1e1b4b 100%);
+}
+
+body[data-bg-theme="arctic-plum"] {
+    background-color: #0b1020;
+    background-image:
+        radial-gradient(ellipse 120% 90% at 50% -10%, rgba(186, 230, 253, 0.12), transparent 45%),
+        radial-gradient(ellipse 90% 80% at 0% 100%, rgba(99, 102, 241, 0.16), transparent 52%),
+        radial-gradient(ellipse 85% 70% at 100% 50%, rgba(139, 92, 246, 0.14), transparent 48%),
+        linear-gradient(160deg, #020617 0%, #1e3a5f 30%, #312e81 55%, #1e1b4b 80%, #020617 100%);
+}
+
+.bg-theme-float {
+    position: fixed;
+    top: max(0.65rem, env(safe-area-inset-top, 0px));
+    right: max(0.65rem, env(safe-area-inset-right, 0px));
+    z-index: 1000;
+}
+
+.bg-theme-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.bg-theme-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(247, 244, 234, 0.75);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.bg-theme-select {
+    font: inherit;
+    font-size: 0.82rem;
+    max-width: min(52vw, 220px);
+    padding: 0.35rem 0.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(13, 19, 33, 0.85);
+    color: var(--text-main);
+    cursor: pointer;
+}
+
+.bg-theme-select:focus {
+    outline: 2px solid rgba(167, 139, 250, 0.55);
+    outline-offset: 1px;
+}
+
+@media (max-width: 480px) {
+    .bg-theme-float {
+        left: max(0.5rem, env(safe-area-inset-left, 0px));
+        right: max(0.5rem, env(safe-area-inset-right, 0px));
+        top: max(0.45rem, env(safe-area-inset-top, 0px));
+    }
+
+    .bg-theme-picker {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .bg-theme-select {
+        max-width: none;
+        flex: 1;
+    }
 }
 
 .library-page {
@@ -68,6 +180,12 @@ body {
         max(1rem, env(safe-area-inset-bottom, 0px))
         max(1rem, env(safe-area-inset-left, 0px));
     box-sizing: border-box;
+}
+
+/* Запас снизу под полоску чата */
+main.library-page,
+main.reader-page {
+    padding-bottom: max(6.5rem, env(safe-area-inset-bottom, 0px) + 3.5rem);
 }
 
 .hero {
@@ -658,4 +776,169 @@ body.reader-fs-pseudo-active {
     .reader-frame-wrap.reader-frame-wrap--canvas {
         min-height: calc(100dvh - 10rem);
     }
+}
+
+/* ---------- Общий чат (Supabase, см. chat-config.js) ---------- */
+.library-chat {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10050;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    pointer-events: none;
+}
+
+.library-chat > * {
+    pointer-events: auto;
+}
+
+.library-chat-toggle {
+    align-self: center;
+    margin-bottom: max(0.35rem, env(safe-area-inset-bottom, 0px));
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text-main);
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px 999px 0 0;
+    padding: 0.55rem 1.25rem 0.65rem;
+    cursor: pointer;
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.35);
+    touch-action: manipulation;
+}
+
+.library-chat-toggle[aria-expanded="true"] {
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
+.library-chat-panel {
+    max-height: min(52vh, 420px);
+    display: flex;
+    flex-direction: column;
+    background: rgba(15, 23, 42, 0.96);
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.library-chat-head {
+    padding: 0.55rem 0.85rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.library-chat-title {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #c9b896;
+    font-weight: 700;
+}
+
+.library-chat-messages {
+    flex: 1 1 auto;
+    min-height: 120px;
+    max-height: 36vh;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    -webkit-overflow-scrolling: touch;
+}
+
+.library-chat-msg {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
+.library-chat-msg-meta {
+    font-size: 0.72rem;
+    color: rgba(247, 244, 234, 0.55);
+}
+
+.library-chat-msg-body {
+    color: var(--text-main);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.library-chat-form {
+    padding: 0.5rem 0.75rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.library-chat-nick {
+    font: inherit;
+    font-size: 0.88rem;
+    padding: 0.4rem 0.55rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--text-main);
+    max-width: 12rem;
+}
+
+.library-chat-row {
+    display: flex;
+    gap: 0.45rem;
+    align-items: stretch;
+}
+
+.library-chat-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    font: inherit;
+    font-size: 0.92rem;
+    padding: 0.5rem 0.6rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--text-main);
+}
+
+.library-chat-send {
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.45rem 0.85rem;
+    border-radius: 10px;
+    border: 1px solid rgba(198, 161, 91, 0.55);
+    background: rgba(198, 161, 91, 0.22);
+    color: var(--text-main);
+    cursor: pointer;
+    white-space: nowrap;
+    touch-action: manipulation;
+}
+
+.library-chat-send:hover {
+    background: rgba(198, 161, 91, 0.35);
+}
+
+.library-chat-send:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.library-chat-status {
+    margin: 0;
+    padding: 0 0.85rem 0.5rem;
+    font-size: 0.82rem;
+    color: #a5d4c8;
+}
+
+.library-chat-status--error {
+    color: #fca5a5;
 }
