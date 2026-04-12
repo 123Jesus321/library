@@ -105,16 +105,16 @@ const books = [
  */
 const USE_GLOBAL_BOOK_RATINGS = true;
 
-/** При USE_GLOBAL_BOOK_RATINGS: стартовые значения 1–5; 0 — нет оценки. */
+/** При USE_GLOBAL_BOOK_RATINGS: стартовые значения 1–5; 0 — нет оценки (правьте здесь «витринные» общие звёзды). */
 const BOOK_RATINGS_DEFAULT = {
-    "Бредни-Сумасшедшего": 0,
-    "Зеронтар-_1_": 0,
-    "Азантир-и-его-устройство-_2_": 0,
-    "Битва-за-Азантир-_1_": 0,
-    Сотворение: 0,
-    Cetus: 0,
-    "Алая-вспышка": 0,
-    "Сборник Стихотворений": 0
+    "Бредни-Сумасшедшего": 4,
+    "Зеронтар-_1_": 5,
+    "Азантир-и-его-устройство-_2_": 4,
+    "Битва-за-Азантир-_1_": 5,
+    Сотворение: 4,
+    Cetus: 4,
+    "Алая-вспышка": 3,
+    "Сборник Стихотворений": 4
 };
 
 /** Кнопка загрузки обложки (data URL в localStorage). */
@@ -161,6 +161,38 @@ const MOBILE_LAYOUT_MAX = 640;
 
 const RATING_STORAGE_KEY = "knigi-book-ratings-v1";
 const RATING_GLOBAL_STORAGE_KEY = "knigi-book-ratings-global-v1";
+const RATING_MIGRATE_DONE_KEY = "knigi-ratings-migrated-personal-to-global-v1";
+
+/** Один раз переносит оценки из личного ключа в общий, если общий пуст (после включения USE_GLOBAL_BOOK_RATINGS). */
+function migratePersonalRatingsToGlobalOnce() {
+    if (!USE_GLOBAL_BOOK_RATINGS) {
+        return;
+    }
+    try {
+        if (localStorage.getItem(RATING_MIGRATE_DONE_KEY)) {
+            return;
+        }
+        const rawG = localStorage.getItem(RATING_GLOBAL_STORAGE_KEY);
+        if (rawG && rawG !== "{}" && rawG.trim() !== "") {
+            try {
+                const o = JSON.parse(rawG);
+                if (o && typeof o === "object" && Object.keys(o).length > 0) {
+                    localStorage.setItem(RATING_MIGRATE_DONE_KEY, "1");
+                    return;
+                }
+            } catch {
+                /* continue */
+            }
+        }
+        const rawP = localStorage.getItem(RATING_STORAGE_KEY);
+        if (rawP && rawP !== "{}") {
+            localStorage.setItem(RATING_GLOBAL_STORAGE_KEY, rawP);
+        }
+        localStorage.setItem(RATING_MIGRATE_DONE_KEY, "1");
+    } catch {
+        /* ignore */
+    }
+}
 const COVER_STORAGE_KEY = "knigi-book-covers-v1";
 
 function isDesktopReader() {
@@ -573,8 +605,8 @@ function renderLibrary() {
                     </div>
                 </a>
                 <div class="book-rating-bar">
-                    <span>Оценка:</span>
-                    <div class="star-rating" role="group" aria-label="Оценка книги «${escapeHtml(
+                    <span>${USE_GLOBAL_BOOK_RATINGS ? "Общая оценка:" : "Оценка:"}</span>
+                    <div class="star-rating" role="group" aria-label="${USE_GLOBAL_BOOK_RATINGS ? "Общая оценка" : "Оценка"} книги «${escapeHtml(
                         book.title
                     )}»">
                         ${renderStarButtons(book.id, rating, prefix)}
@@ -960,6 +992,11 @@ function initReaderRatingUi() {
     }
     readerState.readerRatingBound = true;
 
+    const labelEl = row.querySelector(".reader-rating-label");
+    if (labelEl) {
+        labelEl.textContent = USE_GLOBAL_BOOK_RATINGS ? "Общая оценка:" : "Ваша оценка:";
+    }
+
     const paint = () => {
         const r = getBookRating(readerState.book.id);
         container.innerHTML = renderStarButtons(readerState.book.id, r, "reader");
@@ -1152,6 +1189,7 @@ function renderReader() {
 window.applyKnigiBgTheme = applyBgTheme;
 window.KnigiBG_THEMES = BG_THEMES;
 
+migratePersonalRatingsToGlobalOnce();
 bindLibraryFilters();
 renderLibrary();
 renderReader();

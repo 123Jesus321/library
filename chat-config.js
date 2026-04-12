@@ -63,7 +63,7 @@
  *
  * 2) Project Settings → API: скопируйте URL и anon public key сюда.
  *
- * 3) moderatorSecret — тот же текст, что YOUR_LONG_SECRET в SQL (виден в исходнике страницы; для строгой защиты нужен сервер / Edge Function).
+ * 3) moderatorSecret — дословно как секрет в supabase-chat-setup.sql (в трёх функциях). Если не совпадает — RPC вернёт «forbidden».
  *    modNick — ник модератора в поле «Имя» (без учёта регистра), по умолчанию «Сумасшедший».
  */
 window.LIBRARY_CHAT_SUPABASE = {
