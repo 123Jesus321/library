@@ -4,10 +4,124 @@
     --accent: #c6a15b;
     --text-main: #f7f4ea;
     --text-dark: #1f2430;
+    --knigi-ui-dur: 0.3s;
+    --knigi-ui-dur-mid: 0.42s;
+    --knigi-ui-dur-slow: 0.58s;
+    /* Общий интерактив: мягкий старт и конец */
+    --knigi-ui-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    /* Появление окон и панелей: плавное затухание в конце */
+    --knigi-ui-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    /* Цвет, тень, border — без резких скачков */
+    --knigi-ui-ease-soft: cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+html[data-knigi-ui-animations="off"] {
+    --knigi-ui-dur: 0ms;
+    --knigi-ui-dur-mid: 0ms;
+    --knigi-ui-dur-slow: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --knigi-ui-dur: 0ms;
+        --knigi-ui-dur-mid: 0ms;
+        --knigi-ui-dur-slow: 0ms;
+    }
 }
 
 * {
     box-sizing: border-box;
+}
+
+/* Кнопки и основные интерактивные элементы */
+button,
+.library-chat-send,
+.pdf-nav-btn,
+.fullscreen-btn,
+.pseudo-fs-close,
+input[type="submit"] {
+    transition:
+        transform var(--knigi-ui-dur) var(--knigi-ui-ease),
+        background var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        color var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        border-color var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        box-shadow var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        filter var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        opacity var(--knigi-ui-dur) var(--knigi-ui-ease-soft);
+}
+
+button:hover:not(:disabled),
+.library-chat-send:hover:not(:disabled),
+.pdf-nav-btn:hover:not(:disabled),
+.fullscreen-btn:hover:not(:disabled) {
+    filter: brightness(1.08);
+}
+
+button:active:not(:disabled),
+.library-chat-send:active:not(:disabled),
+.pdf-nav-btn:active:not(:disabled),
+.fullscreen-btn:active:not(:disabled),
+.pseudo-fs-close:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+.settings-fab:active:not(:disabled) {
+    transform: scale(0.94);
+}
+
+.back-btn {
+    transition:
+        background var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        border-color var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        transform var(--knigi-ui-dur) var(--knigi-ui-ease),
+        box-shadow var(--knigi-ui-dur) var(--knigi-ui-ease-soft);
+}
+
+.back-btn:active {
+    transform: scale(0.98);
+}
+
+.filter-input,
+.filter-select,
+.settings-select,
+.library-chat-input,
+.library-chat-nick {
+    transition:
+        border-color var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        box-shadow var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        background var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        outline-color var(--knigi-ui-dur) var(--knigi-ui-ease-soft);
+}
+
+.star-btn {
+    transition:
+        color var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft),
+        background var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft),
+        transform var(--knigi-ui-dur) var(--knigi-ui-ease),
+        text-shadow var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft);
+}
+
+.star-btn:active:not(:disabled) {
+    transform: scale(0.92);
+}
+
+.book-cover-upload-btn,
+.library-chat-toggle,
+.library-chat-msg-btn {
+    transition:
+        transform var(--knigi-ui-dur) var(--knigi-ui-ease),
+        background var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        border-color var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        box-shadow var(--knigi-ui-dur) var(--knigi-ui-ease-soft);
+}
+
+.book-cover-upload-btn:active,
+.library-chat-msg-btn:active {
+    transform: scale(0.94);
+}
+
+.library-chat-toggle:active {
+    transform: scale(0.97);
 }
 
 body {
@@ -18,6 +132,8 @@ body {
     min-height: 100dvh;
     background-attachment: fixed;
     background-color: #0f0618;
+    display: flex;
+    flex-direction: column;
 }
 
 /* --- Темы фона (переключатель: data-bg-theme на body) --- */
@@ -176,7 +292,7 @@ body[data-bg-theme="copper-eclipse"] {
     position: absolute;
     inset: -25%;
     opacity: 0;
-    transition: opacity 0.6s ease;
+    transition: opacity var(--knigi-ui-dur-slow) var(--knigi-ui-ease-soft);
     background: linear-gradient(
         125deg,
         rgba(139, 92, 246, 0.45) 0%,
@@ -242,12 +358,15 @@ body[data-bg-theme="copper-eclipse"] {
     place-items: center;
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
     touch-action: manipulation;
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition:
+        transform var(--knigi-ui-dur) var(--knigi-ui-ease),
+        background var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        box-shadow var(--knigi-ui-dur) var(--knigi-ui-ease-soft);
 }
 
 .settings-fab:hover {
     background: rgba(198, 161, 91, 0.28);
-    transform: scale(1.05);
+    transform: scale(1.06);
 }
 
 .settings-backdrop {
@@ -257,6 +376,21 @@ body[data-bg-theme="copper-eclipse"] {
     background: rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity var(--knigi-ui-dur-slow) var(--knigi-ui-ease-out),
+        visibility var(--knigi-ui-dur-slow) step-end;
+}
+
+.settings-backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+        opacity var(--knigi-ui-dur-slow) var(--knigi-ui-ease-out),
+        visibility 0s step-start;
 }
 
 .settings-panel {
@@ -264,7 +398,6 @@ body[data-bg-theme="copper-eclipse"] {
     z-index: 10080;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
     width: min(420px, calc(100vw - 1.5rem));
     max-height: min(88vh, 640px);
     overflow: hidden;
@@ -272,6 +405,18 @@ body[data-bg-theme="copper-eclipse"] {
     border: 1px solid rgba(255, 255, 255, 0.18);
     background: rgba(18, 24, 40, 0.97);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.94);
+    pointer-events: none;
+    transition:
+        opacity var(--knigi-ui-dur-slow) var(--knigi-ui-ease-out),
+        transform var(--knigi-ui-dur-slow) var(--knigi-ui-ease-out);
+}
+
+.settings-panel.is-open {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
 }
 
 .settings-panel-inner {
@@ -307,6 +452,13 @@ body[data-bg-theme="copper-eclipse"] {
     cursor: pointer;
     line-height: 1;
     touch-action: manipulation;
+    transition:
+        background var(--knigi-ui-dur) var(--knigi-ui-ease-soft),
+        transform var(--knigi-ui-dur) var(--knigi-ui-ease);
+}
+
+.settings-close:active {
+    transform: scale(0.92);
 }
 
 .settings-close:hover {
@@ -435,21 +587,48 @@ body.settings-open {
         right: 0.5rem;
         top: auto;
         bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
-        transform: none;
         width: auto;
         max-height: 85dvh;
+        transform: translateY(110%);
+        opacity: 0;
+    }
+
+    .settings-panel.is-open {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
 .library-page {
     width: min(1200px, 100%);
     margin: 0 auto;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     padding:
         max(2.2rem, env(safe-area-inset-top, 0px))
         max(1rem, env(safe-area-inset-right, 0px))
         max(2.8rem, env(safe-area-inset-bottom, 0px))
         max(1rem, env(safe-area-inset-left, 0px));
     box-sizing: border-box;
+}
+
+.library-books-area {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 12rem;
+}
+
+.library-books-area .library-empty {
+    flex-shrink: 0;
+}
+
+.library-books-area .book-grid {
+    flex: 1 1 auto;
+    min-height: min(100%, calc(100dvh - 22rem));
+    align-content: start;
 }
 
 /* Страница чтения: на всю высоту окна */
@@ -602,7 +781,10 @@ main.reader-page {
         linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
     border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    transition:
+        transform var(--knigi-ui-dur-mid) var(--knigi-ui-ease-out),
+        box-shadow var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft),
+        border-color var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft);
 }
 
 .book-card:hover {
@@ -612,6 +794,7 @@ main.reader-page {
 }
 
 .book-cover {
+    position: relative;
     aspect-ratio: 3 / 4;
     display: grid;
     place-items: center;
@@ -619,9 +802,21 @@ main.reader-page {
     background:
         linear-gradient(135deg, rgba(198, 161, 91, 0.22), rgba(234, 223, 190, 0.1)),
         linear-gradient(140deg, #263852, #1b263b);
+    overflow: hidden;
 }
 
-.book-cover span {
+.book-cover img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.book-cover .book-cover-fallback {
+    position: relative;
+    z-index: 1;
     color: #f8f1da;
     text-align: center;
     font-weight: 700;
@@ -629,6 +824,64 @@ main.reader-page {
     overflow-wrap: anywhere;
     word-break: break-word;
     max-width: 100%;
+}
+
+.book-cover.has-image .book-cover-fallback {
+    display: none;
+}
+
+.book-cover-upload-wrap {
+    position: absolute;
+    right: 0.35rem;
+    bottom: 0.35rem;
+    z-index: 2;
+}
+
+.book-cover-upload-btn {
+    font: inherit;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.3rem 0.45rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: rgba(13, 19, 33, 0.82);
+    color: #f4e4be;
+    cursor: pointer;
+    touch-action: manipulation;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.book-cover-upload-btn:hover,
+.book-cover-upload-btn:focus-visible {
+    background: rgba(198, 161, 91, 0.45);
+    outline: none;
+}
+
+.book-cover-file {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.book-tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.35rem;
+    margin-top: 0.45rem;
+}
+
+.book-tag-chip {
+    display: inline-block;
+    padding: 0.12rem 0.4rem;
+    border-radius: 6px;
+    background: rgba(31, 36, 48, 0.08);
+    color: rgba(31, 36, 48, 0.88);
+    font-weight: 600;
+    font-size: 0.7rem;
 }
 
 .book-info {
@@ -708,7 +961,6 @@ main.reader-page {
     cursor: pointer;
     touch-action: manipulation;
     font-size: 1.15rem;
-    transition: color 0.15s ease, background 0.15s ease, transform 0.1s ease;
 }
 
 .star-btn.is-on {
@@ -795,7 +1047,6 @@ main.reader-page {
     border: 1px solid rgba(198, 161, 91, 0.45);
     border-radius: 10px;
     padding: 0.6rem 0.95rem;
-    transition: background 0.2s ease;
 }
 
 .back-btn:hover {
@@ -1084,6 +1335,7 @@ body.reader-fs-pseudo-active {
     flex-direction: column;
     align-items: stretch;
     pointer-events: none;
+    overflow: hidden;
 }
 
 .library-chat > * {
@@ -1109,7 +1361,11 @@ body.reader-fs-pseudo-active {
     box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.35);
     touch-action: manipulation;
     min-width: 12rem;
-    transition: border-radius 0.2s ease, margin-bottom 0.2s ease;
+    transition:
+        border-radius var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft),
+        margin-bottom var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft),
+        transform var(--knigi-ui-dur) var(--knigi-ui-ease),
+        box-shadow var(--knigi-ui-dur) var(--knigi-ui-ease-soft);
 }
 
 .library-chat--open .library-chat-toggle {
@@ -1117,18 +1373,43 @@ body.reader-fs-pseudo-active {
     margin-bottom: 0;
 }
 
-.library-chat-panel[hidden] {
-    display: none !important;
-}
-
 .library-chat-panel {
-    max-height: min(52vh, 420px);
     display: flex;
     flex-direction: column;
     background: rgba(15, 23, 42, 0.96);
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    max-height: 0;
+    min-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    border-top: 1px solid transparent;
+    box-shadow: none;
+    padding-bottom: 0;
+    transition:
+        max-height var(--knigi-ui-dur-slow) var(--knigi-ui-ease-out),
+        opacity var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft),
+        visibility var(--knigi-ui-dur-slow) step-end,
+        border-color var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft),
+        box-shadow var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft),
+        padding-bottom var(--knigi-ui-dur-slow) var(--knigi-ui-ease-soft);
+}
+
+.library-chat.library-chat--open .library-chat-panel {
+    max-height: min(52vh, 420px);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    border-top-color: rgba(255, 255, 255, 0.18);
     box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
     padding-bottom: env(safe-area-inset-bottom, 0px);
+    transition:
+        max-height var(--knigi-ui-dur-slow) var(--knigi-ui-ease-out),
+        opacity var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft),
+        visibility 0s step-start,
+        border-color var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft),
+        box-shadow var(--knigi-ui-dur-mid) var(--knigi-ui-ease-soft),
+        padding-bottom var(--knigi-ui-dur-slow) var(--knigi-ui-ease-soft);
 }
 
 .library-chat-head {
@@ -1166,7 +1447,108 @@ body.reader-fs-pseudo-active {
     line-height: 1.45;
 }
 
+.library-chat-msg-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.library-chat-msg-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    flex-shrink: 0;
+}
+
+.library-chat-msg-btn {
+    font: inherit;
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 0.2rem 0.35rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--text-main);
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.library-chat-msg-btn:hover {
+    background: rgba(244, 63, 94, 0.35);
+    border-color: rgba(244, 63, 94, 0.55);
+}
+
+.library-chat-mod {
+    padding: 0.5rem 0.75rem 0.65rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.library-chat-mod[hidden] {
+    display: none !important;
+}
+
+.library-chat-mod-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #e8c547;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+
+.library-chat-mod-hint {
+    margin: 0 0 0.45rem;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: #fca5a5;
+}
+
+.library-chat-ban-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    max-height: 28vh;
+    overflow-y: auto;
+}
+
+.library-chat-ban-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: rgba(247, 244, 234, 0.88);
+}
+
+.library-chat-ban-empty {
+    opacity: 0.65;
+    font-style: italic;
+}
+
+.library-chat-ban-nick {
+    font-weight: 700;
+    color: #f4e4be;
+}
+
+.library-chat-ban-when {
+    font-size: 0.72rem;
+    color: rgba(247, 244, 234, 0.45);
+    flex: 1 1 auto;
+}
+
+.library-chat-ban-item .library-chat-unban {
+    margin-left: auto;
+}
+
 .library-chat-msg-meta {
+    flex: 1 1 auto;
+    min-width: 0;
     font-size: 0.72rem;
     color: rgba(247, 244, 234, 0.55);
 }

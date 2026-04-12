@@ -28,6 +28,10 @@
                     <select id="settings-bg-theme" class="settings-select"></select>
                 </label>
                 <label class="settings-checkbox">
+                    <input type="checkbox" id="settings-ui-animations" checked>
+                    <span>Анимации кнопок и всплывающих окон</span>
+                </label>
+                <label class="settings-checkbox">
                     <input type="checkbox" id="settings-gradient-shimmer" checked>
                     <span>Переливание градиента (анимация фона)</span>
                 </label>
@@ -52,7 +56,9 @@
                     </div>
                     <input type="range" id="settings-particle-speed" class="settings-range" min="5" max="100" value="45" aria-label="Скорость анимации украшений и перелива">
                 </div>
-                <p class="settings-hint">Настройки сохраняются в этом браузере.</p>
+                <p class="settings-hint">
+                    Настройки сохраняются в этом браузере. Если в системе включено «Уменьшить движение», анимации интерфейса тоже отключаются.
+                </p>
             </div>
         </div>
     </div>
@@ -62,7 +68,7 @@
             <p class="hero-kicker">Электронная библиотека</p>
             <h1>Выберите книгу и начните чтение</h1>
             <p class="hero-subtitle">
-                Фильтры по автору, названию, серии и дате обновления. На телефоне «Полный экран» разворачивает страницу без системного API (работает в Safari). Оценки хранятся в браузере.
+                Фильтры по автору, названию, тегам, серии и дате обновления. На телефоне «Полный экран» разворачивает страницу без системного API (работает в Safari). Режим оценок задаётся в <code>books.js</code>.
             </p>
         </section>
 
@@ -85,6 +91,13 @@
                 </select>
             </label>
             <label class="filter-field">
+                <span class="filter-label">Тег</span>
+                <select id="filter-tag" class="filter-select">
+                    <option value="">Все теги</option>
+                    <option value="__none__">Без тегов</option>
+                </select>
+            </label>
+            <label class="filter-field">
                 <span class="filter-label">Сортировка</span>
                 <select id="filter-sort" class="filter-select">
                     <option value="updated-desc">Дата обновления (новые сверху)</option>
@@ -96,15 +109,17 @@
             </label>
         </section>
 
-        <p id="library-empty" class="library-empty" hidden>Ничего не найдено — измените фильтры.</p>
-        <section id="book-grid" class="book-grid" aria-label="Список книг"></section>
+        <div class="library-books-area">
+            <p id="library-empty" class="library-empty" hidden>Ничего не найдено — измените фильтры.</p>
+            <section id="book-grid" class="book-grid" aria-label="Список книг"></section>
+        </div>
     </main>
 
     <aside class="library-chat" id="library-chat" aria-label="Общий чат">
         <button type="button" class="library-chat-toggle" id="library-chat-toggle" aria-expanded="false" aria-controls="library-chat-panel">
             💬 Открыть чат
         </button>
-        <div class="library-chat-panel" id="library-chat-panel" hidden>
+        <div class="library-chat-panel" id="library-chat-panel">
             <div class="library-chat-head">
                 <span class="library-chat-title">Сообщения видят все читатели</span>
             </div>
@@ -117,6 +132,11 @@
                 </div>
             </form>
             <p class="library-chat-status" id="library-chat-status" hidden></p>
+            <div class="library-chat-mod" id="library-chat-mod" hidden>
+                <div class="library-chat-mod-title">Модерация</div>
+                <p class="library-chat-mod-hint" id="library-chat-mod-hint" hidden></p>
+                <ul class="library-chat-ban-list" id="library-chat-ban-list"></ul>
+            </div>
         </div>
     </aside>
 

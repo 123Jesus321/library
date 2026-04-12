@@ -28,6 +28,10 @@
                     <select id="settings-bg-theme" class="settings-select"></select>
                 </label>
                 <label class="settings-checkbox">
+                    <input type="checkbox" id="settings-ui-animations" checked>
+                    <span>Анимации кнопок и всплывающих окон</span>
+                </label>
+                <label class="settings-checkbox">
                     <input type="checkbox" id="settings-gradient-shimmer" checked>
                     <span>Переливание градиента (анимация фона)</span>
                 </label>
@@ -52,7 +56,9 @@
                     </div>
                     <input type="range" id="settings-particle-speed" class="settings-range" min="5" max="100" value="45" aria-label="Скорость анимации украшений и перелива">
                 </div>
-                <p class="settings-hint">Настройки сохраняются в этом браузере.</p>
+                <p class="settings-hint">
+                    Настройки сохраняются в этом браузере. Если в системе включено «Уменьшить движение», анимации интерфейса тоже отключаются.
+                </p>
             </div>
         </div>
     </div>

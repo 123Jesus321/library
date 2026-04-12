@@ -8,7 +8,9 @@ const books = [
         seriesId: null,
         seriesTitle: null,
         seriesOrder: null,
-        updatedAt: "2025-08-12"
+        updatedAt: "2025-08-12",
+        tags: ["рассказы", "юмор"],
+        coverImage: null
     },
     {
         id: "Зеронтар-_1_",
@@ -18,7 +20,9 @@ const books = [
         seriesId: "miller-azantir",
         seriesTitle: "Хроники Террианы",
         seriesOrder: 1,
-        updatedAt: "2026-03-16"
+        updatedAt: "2026-03-16",
+        tags: ["фэнтези", "Терриана"],
+        coverImage: null
     },
     {
         id: "Азантир-и-его-устройство-_2_",
@@ -28,7 +32,9 @@ const books = [
         seriesId: "miller-azantir",
         seriesTitle: "Хроники Террианы",
         seriesOrder: 2,
-        updatedAt: "2026-03-15"
+        updatedAt: "2026-03-15",
+        tags: ["фэнтези", "Терриана"],
+        coverImage: null
     },
     {
         id: "Битва-за-Азантир-_1_",
@@ -38,7 +44,9 @@ const books = [
         seriesId: "miller-azantir",
         seriesTitle: "Хроники Террианы",
         seriesOrder: 3,
-        updatedAt: "2026-03-19"
+        updatedAt: "2026-03-19",
+        tags: ["фэнтези", "Терриана", "битва"],
+        coverImage: null
     },
     {
         id: "Сотворение",
@@ -48,7 +56,9 @@ const books = [
         seriesId: "miller-azantir",
         seriesTitle: "Хроники Террианы",
         seriesOrder: 4,
-        updatedAt: "2026-03-22"
+        updatedAt: "2026-03-22",
+        tags: ["фэнтези", "Терриана"],
+        coverImage: null
     },
     {
         id: "Cetus",
@@ -58,7 +68,9 @@ const books = [
         seriesId: "somebadhum-prose",
         seriesTitle: "Проза SomeBadHum",
         seriesOrder: 1,
-        updatedAt: "2025-11-05"
+        updatedAt: "2025-11-05",
+        tags: ["проза", "sci-fi"],
+        coverImage: null
     },
     {
         id: "Алая-вспышка",
@@ -68,7 +80,9 @@ const books = [
         seriesId: null,
         seriesTitle: null,
         seriesOrder: null,
-        updatedAt: "2026-01-10"
+        updatedAt: "2026-01-10",
+        tags: ["проза", "драма"],
+        coverImage: null
     },
     {
         id: "Сборник Стихотворений",
@@ -78,9 +92,35 @@ const books = [
         seriesId: "somebadhum-prose",
         seriesTitle: "Проза SomeBadHum",
         seriesOrder: 2,
-        updatedAt: "2025-12-22"
+        updatedAt: "2025-12-22",
+        tags: ["стихи", "проза"],
+        coverImage: null
     }
 ];
+
+/**
+ * true — «общий» слой оценок: ключ RATING_GLOBAL_STORAGE_KEY + старт из BOOK_RATINGS_DEFAULT.
+ * false — только личные оценки (RATING_STORAGE_KEY).
+ * Одинаковые оценки у всех в интернете без сервера невозможны; задавайте BOOK_RATINGS_DEFAULT и перезаливайте сайт.
+ */
+const USE_GLOBAL_BOOK_RATINGS = true;
+
+/** При USE_GLOBAL_BOOK_RATINGS: стартовые значения 1–5; 0 — нет оценки. */
+const BOOK_RATINGS_DEFAULT = {
+    "Бредни-Сумасшедшего": 0,
+    "Зеронтар-_1_": 0,
+    "Азантир-и-его-устройство-_2_": 0,
+    "Битва-за-Азантир-_1_": 0,
+    Сотворение: 0,
+    Cetus: 0,
+    "Алая-вспышка": 0,
+    "Сборник Стихотворений": 0
+};
+
+/** Кнопка загрузки обложки (data URL в localStorage). */
+const ALLOW_LOCAL_COVER_UPLOAD = true;
+
+const MAX_COVER_FILE_BYTES = 2.5 * 1024 * 1024;
 
 const BG_THEME_STORAGE_KEY = "knigi-bg-theme-v1";
 
@@ -120,6 +160,8 @@ const DESKTOP_PDF_WIDTH_FACTOR = 0.72;
 const MOBILE_LAYOUT_MAX = 640;
 
 const RATING_STORAGE_KEY = "knigi-book-ratings-v1";
+const RATING_GLOBAL_STORAGE_KEY = "knigi-book-ratings-global-v1";
+const COVER_STORAGE_KEY = "knigi-book-covers-v1";
 
 function isDesktopReader() {
     return window.matchMedia(`(min-width: ${MOBILE_LAYOUT_MAX + 1}px)`).matches;
@@ -144,18 +186,28 @@ function getFilterState() {
     const qEl = document.getElementById("filter-q");
     const authorEl = document.getElementById("filter-author");
     const seriesEl = document.getElementById("filter-series");
+    const tagEl = document.getElementById("filter-tag");
     const sortEl = document.getElementById("filter-sort");
     return {
         q: (qEl && qEl.value ? qEl.value : "").trim(),
         author: authorEl ? authorEl.value : "",
         series: seriesEl ? seriesEl.value : "",
+        tag: tagEl ? tagEl.value : "",
         sort: sortEl && sortEl.value ? sortEl.value : "updated-desc"
     };
 }
 
+function getBookTags(book) {
+    const t = book.tags;
+    if (!Array.isArray(t)) {
+        return [];
+    }
+    return t.map((x) => String(x).trim()).filter(Boolean);
+}
+
 function getFilteredBooks() {
     let list = books.slice();
-    const { q, author, series, sort } = getFilterState();
+    const { q, author, series, tag, sort } = getFilterState();
     const ql = q.toLowerCase();
     if (ql) {
         list = list.filter((b) => b.title.toLowerCase().includes(ql));
@@ -167,6 +219,11 @@ function getFilteredBooks() {
         list = list.filter((b) => !b.seriesId);
     } else if (series) {
         list = list.filter((b) => b.seriesId === series);
+    }
+    if (tag === "__none__") {
+        list = list.filter((b) => getBookTags(b).length === 0);
+    } else if (tag) {
+        list = list.filter((b) => getBookTags(b).includes(tag));
     }
 
     const dateMs = (b) => {
@@ -199,7 +256,8 @@ function getFilteredBooks() {
 function populateFilterOptions() {
     const authorSel = document.getElementById("filter-author");
     const seriesSel = document.getElementById("filter-series");
-    if (!authorSel || !seriesSel) {
+    const tagSel = document.getElementById("filter-tag");
+    if (!authorSel || !seriesSel || !tagSel) {
         return;
     }
 
@@ -230,6 +288,21 @@ function populateFilterOptions() {
     if (allowed.has(savedSeries)) {
         seriesSel.value = savedSeries;
     }
+
+    const tagSet = new Set();
+    books.forEach((b) => {
+        getBookTags(b).forEach((t) => tagSet.add(t));
+    });
+    const savedTag = tagSel.value;
+    let tagHtml = `<option value="">Все теги</option><option value="__none__">Без тегов</option>`;
+    [...tagSet].sort((a, b) => a.localeCompare(b, "ru")).forEach((t) => {
+        tagHtml += `<option value="${escapeAttr(t)}">${escapeHtml(t)}</option>`;
+    });
+    tagSel.innerHTML = tagHtml;
+    const tagAllowed = new Set(["", "__none__", ...tagSet]);
+    if (tagAllowed.has(savedTag)) {
+        tagSel.value = savedTag;
+    }
 }
 
 let libraryFiltersBound = false;
@@ -238,6 +311,7 @@ function bindLibraryFilters() {
     const q = document.getElementById("filter-q");
     const author = document.getElementById("filter-author");
     const series = document.getElementById("filter-series");
+    const tag = document.getElementById("filter-tag");
     const sort = document.getElementById("filter-sort");
     if (!q && !author) {
         return;
@@ -249,7 +323,7 @@ function bindLibraryFilters() {
     libraryFiltersBound = true;
 
     const rerender = () => renderLibrary();
-    [q, author, series, sort].forEach((el) => {
+    [q, author, series, tag, sort].forEach((el) => {
         if (!el) {
             return;
         }
@@ -272,9 +346,13 @@ function escapeAttr(str) {
     return String(str).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 }
 
-function loadRatings() {
+function getRatingStorageKey() {
+    return USE_GLOBAL_BOOK_RATINGS ? RATING_GLOBAL_STORAGE_KEY : RATING_STORAGE_KEY;
+}
+
+function loadRatingsMap(key) {
     try {
-        const raw = localStorage.getItem(RATING_STORAGE_KEY);
+        const raw = localStorage.getItem(key);
         if (!raw) {
             return {};
         }
@@ -285,16 +363,22 @@ function loadRatings() {
     }
 }
 
-function saveRatings(obj) {
+function saveRatingsMap(key, obj) {
     try {
-        localStorage.setItem(RATING_STORAGE_KEY, JSON.stringify(obj));
+        localStorage.setItem(key, JSON.stringify(obj));
     } catch {
         /* ignore */
     }
 }
 
 function getBookRating(bookId) {
-    const n = Number(loadRatings()[bookId]);
+    let map;
+    if (USE_GLOBAL_BOOK_RATINGS) {
+        map = { ...BOOK_RATINGS_DEFAULT, ...loadRatingsMap(getRatingStorageKey()) };
+    } else {
+        map = loadRatingsMap(RATING_STORAGE_KEY);
+    }
+    const n = Number(map[bookId]);
     if (n >= 1 && n <= 5) {
         return n;
     }
@@ -302,9 +386,73 @@ function getBookRating(bookId) {
 }
 
 function setBookRating(bookId, stars) {
-    const all = loadRatings();
-    all[bookId] = Math.max(1, Math.min(5, Math.round(Number(stars))));
-    saveRatings(all);
+    const val = Math.max(1, Math.min(5, Math.round(Number(stars))));
+    const key = getRatingStorageKey();
+    const cur = loadRatingsMap(key);
+    cur[bookId] = val;
+    saveRatingsMap(key, cur);
+}
+
+function loadCoverMap() {
+    try {
+        const raw = localStorage.getItem(COVER_STORAGE_KEY);
+        if (!raw) {
+            return {};
+        }
+        const o = JSON.parse(raw);
+        return typeof o === "object" && o !== null ? o : {};
+    } catch {
+        return {};
+    }
+}
+
+function saveCoverMap(obj) {
+    try {
+        localStorage.setItem(COVER_STORAGE_KEY, JSON.stringify(obj));
+    } catch {
+        /* ignore */
+    }
+}
+
+function getBookCoverUrl(book) {
+    const map = loadCoverMap();
+    const fromStore = map[book.id];
+    if (typeof fromStore === "string" && fromStore.startsWith("data:")) {
+        return fromStore;
+    }
+    if (book.coverImage && String(book.coverImage).trim()) {
+        return String(book.coverImage).trim();
+    }
+    return "";
+}
+
+function coverSrcForHtml(url) {
+    if (!url) {
+        return "";
+    }
+    if (url.startsWith("data:")) {
+        return url;
+    }
+    return escapeAttr(url);
+}
+
+function renderBookCoverBlock(book) {
+    const url = getBookCoverUrl(book);
+    const hasImg = Boolean(url);
+    const imgTag = hasImg
+        ? `<img src="${coverSrcForHtml(url)}" alt="" loading="lazy" decoding="async">`
+        : "";
+    const uploadBlock = ALLOW_LOCAL_COVER_UPLOAD
+        ? `<div class="book-cover-upload-wrap">
+            <button type="button" class="book-cover-upload-btn" data-cover-action="pick" aria-label="Загрузить изображение обложки">Обложка</button>
+            <input type="file" class="book-cover-file" accept="image/*" tabindex="-1" aria-hidden="true">
+        </div>`
+        : "";
+    return `<div class="book-cover${hasImg ? " has-image" : ""}">
+            ${imgTag}
+            <span class="book-cover-fallback">${escapeHtml(book.title)}<br>${escapeHtml(book.author)}</span>
+            ${uploadBlock}
+        </div>`;
 }
 
 function renderStarButtons(bookId, current, idPrefix) {
@@ -318,15 +466,26 @@ function renderStarButtons(bookId, current, idPrefix) {
     return html;
 }
 
-let libraryRatingGridBound = false;
+let libraryGridUiBound = false;
 
-function bindLibraryRatingGrid() {
+function bindLibraryGridUi() {
     const grid = document.getElementById("book-grid");
-    if (!grid || libraryRatingGridBound) {
+    if (!grid || libraryGridUiBound) {
         return;
     }
-    libraryRatingGridBound = true;
+    libraryGridUiBound = true;
     grid.addEventListener("click", (e) => {
+        const pickBtn = e.target.closest(".book-cover-upload-btn");
+        if (pickBtn && grid.contains(pickBtn)) {
+            e.preventDefault();
+            e.stopPropagation();
+            const wrap = pickBtn.closest(".book-cover-upload-wrap");
+            const input = wrap && wrap.querySelector(".book-cover-file");
+            if (input) {
+                input.click();
+            }
+            return;
+        }
         const btn = e.target.closest(".star-btn");
         if (!btn || !grid.contains(btn)) {
             return;
@@ -340,6 +499,35 @@ function bindLibraryRatingGrid() {
         }
         setBookRating(bookId, value);
         renderLibrary();
+    });
+    grid.addEventListener("change", (e) => {
+        const input = e.target.closest(".book-cover-file");
+        if (!input || !grid.contains(input)) {
+            return;
+        }
+        const tile = input.closest(".book-tile");
+        const bookId = tile && tile.getAttribute("data-book-id");
+        const file = input.files && input.files[0];
+        input.value = "";
+        if (!bookId || !file || !file.type.startsWith("image/")) {
+            return;
+        }
+        if (file.size > MAX_COVER_FILE_BYTES) {
+            window.alert(`Файл слишком большой (макс. ${Math.round(MAX_COVER_FILE_BYTES / 1024 / 1024)} МБ).`);
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+            const dataUrl = typeof reader.result === "string" ? reader.result : "";
+            if (!dataUrl.startsWith("data:")) {
+                return;
+            }
+            const map = loadCoverMap();
+            map[bookId] = dataUrl;
+            saveCoverMap(map);
+            renderLibrary();
+        };
+        reader.readAsDataURL(file);
     });
 }
 
@@ -363,15 +551,21 @@ function renderLibrary() {
             const seriesChip = book.seriesTitle
                 ? `<span class="book-series-chip">${escapeHtml(book.seriesTitle)}</span>`
                 : "";
+            const tagList = getBookTags(book);
+            const tagsRow =
+                tagList.length > 0
+                    ? `<div class="book-tags-row">${tagList
+                          .map((t) => `<span class="book-tag-chip">${escapeHtml(t)}</span>`)
+                          .join("")}</div>`
+                    : "";
             return `
             <article class="book-tile" data-book-id="${escapeAttr(book.id)}">
                 <a class="book-card" href="${href}">
-                    <div class="book-cover">
-                        <span>${escapeHtml(book.title)}<br>${escapeHtml(book.author)}</span>
-                    </div>
+                    ${renderBookCoverBlock(book)}
                     <div class="book-info">
                         <h2>${escapeHtml(book.title)}</h2>
                         <p>${escapeHtml(book.author)}</p>
+                        ${tagsRow}
                         <div class="book-meta-line">
                             <span class="book-updated">${escapeHtml(formatDateRu(book.updatedAt))}</span>
                             ${seriesChip}
@@ -391,7 +585,7 @@ function renderLibrary() {
         })
         .join("");
 
-    bindLibraryRatingGrid();
+    bindLibraryGridUi();
 }
 
 function isPdfFile(url) {

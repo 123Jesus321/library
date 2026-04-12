@@ -4,6 +4,7 @@
 
     const defaults = () => ({
         bgTheme: "crimson-violet",
+        uiAnimations: true,
         gradientShimmer: true,
         particleMode: "none",
         particleSpeed: 45,
@@ -30,6 +31,7 @@
         }
         s.particleSpeed = Math.max(5, Math.min(100, Number(s.particleSpeed) || 45));
         s.particleLinesCount = Math.max(1, Math.min(40, Number(s.particleLinesCount) || 7));
+        s.uiAnimations = s.uiAnimations !== false;
         return s;
     }
 
@@ -279,6 +281,26 @@
         rafId = requestAnimationFrame(frame);
     }
 
+    function applyUiMotion(uiOn) {
+        if (uiOn) {
+            document.documentElement.removeAttribute("data-knigi-ui-animations");
+        } else {
+            document.documentElement.setAttribute("data-knigi-ui-animations", "off");
+        }
+    }
+
+    function getUiTransitionMs() {
+        const raw =
+            getComputedStyle(document.documentElement).getPropertyValue("--knigi-ui-dur-slow").trim() ||
+            "0.58s";
+        const m = raw.match(/^([\d.]+)(ms|s)$/i);
+        if (!m) {
+            return 580;
+        }
+        const n = parseFloat(m[1], 10);
+        return m[2].toLowerCase() === "ms" ? Math.round(n) : Math.round(n * 1000);
+    }
+
     function applyShimmer(el, on, particleSpeed) {
         if (!el) {
             return;
@@ -298,6 +320,7 @@
 
     function syncFormFromSettings(s) {
         const themeSel = document.getElementById("settings-bg-theme");
+        const uiAnimCb = document.getElementById("settings-ui-animations");
         const gradCb = document.getElementById("settings-gradient-shimmer");
         const speedRange = document.getElementById("settings-particle-speed");
         const speedVal = document.getElementById("settings-particle-speed-val");
@@ -305,6 +328,9 @@
         const linesVal = document.getElementById("settings-particle-lines-val");
         if (themeSel) {
             themeSel.value = s.bgTheme;
+        }
+        if (uiAnimCb) {
+            uiAnimCb.checked = !!s.uiAnimations;
         }
         if (gradCb) {
             gradCb.checked = !!s.gradientShimmer;
@@ -329,6 +355,7 @@
 
     function gatherFormSettings() {
         const themeSel = document.getElementById("settings-bg-theme");
+        const uiAnimCb = document.getElementById("settings-ui-animations");
         const gradCb = document.getElementById("settings-gradient-shimmer");
         const speedRange = document.getElementById("settings-particle-speed");
         const linesRange = document.getElementById("settings-particle-lines");
@@ -341,6 +368,7 @@
         const rawLines = linesRange ? Number(linesRange.value) : 7;
         return {
             bgTheme: themeSel ? themeSel.value : "crimson-violet",
+            uiAnimations: uiAnimCb ? uiAnimCb.checked : true,
             gradientShimmer: gradCb ? gradCb.checked : true,
             particleMode,
             particleSpeed: speedRange ? Number(speedRange.value) : 45,
@@ -352,6 +380,7 @@
         if (typeof window.applyKnigiBgTheme === "function") {
             window.applyKnigiBgTheme(s.bgTheme);
         }
+        applyUiMotion(!!s.uiAnimations);
         document.documentElement.style.setProperty("--knigi-fx-speed", String(s.particleSpeed));
 
         const shimmer = document.getElementById("bg-fx-shimmer");
@@ -366,19 +395,32 @@
     function openPanel(backdrop, panel, btn) {
         backdrop.hidden = false;
         panel.hidden = false;
+        backdrop.classList.remove("is-open");
+        panel.classList.remove("is-open");
         if (btn) {
             btn.setAttribute("aria-expanded", "true");
         }
         document.body.classList.add("settings-open");
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                backdrop.classList.add("is-open");
+                panel.classList.add("is-open");
+            });
+        });
     }
 
     function closePanel(backdrop, panel, btn) {
-        backdrop.hidden = true;
-        panel.hidden = true;
+        backdrop.classList.remove("is-open");
+        panel.classList.remove("is-open");
         if (btn) {
             btn.setAttribute("aria-expanded", "false");
         }
-        document.body.classList.remove("settings-open");
+        const ms = getUiTransitionMs();
+        window.setTimeout(() => {
+            backdrop.hidden = true;
+            panel.hidden = true;
+            document.body.classList.remove("settings-open");
+        }, ms);
     }
 
     function initKnigiSettingsUi() {
@@ -389,6 +431,7 @@
         const backdrop = document.getElementById("settings-backdrop");
         const panel = document.getElementById("settings-panel");
         const themeSel = document.getElementById("settings-bg-theme");
+        const uiAnimCb = document.getElementById("settings-ui-animations");
         const gradCb = document.getElementById("settings-gradient-shimmer");
         const speedRange = document.getElementById("settings-particle-speed");
         const speedVal = document.getElementById("settings-particle-speed-val");
@@ -434,6 +477,7 @@
         }
 
         themeSel?.addEventListener("change", persistFromForm);
+        uiAnimCb?.addEventListener("change", persistFromForm);
         gradCb?.addEventListener("change", persistFromForm);
         speedRange?.addEventListener("input", () => {
             if (speedVal) {
