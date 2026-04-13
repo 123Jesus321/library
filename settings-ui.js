@@ -8,7 +8,9 @@
         gradientShimmer: true,
         particleMode: "none",
         particleSpeed: 45,
-        particleLinesCount: 7
+        particleLinesCount: 7,
+        pdfBg: "#2a3142",
+        pdfTextTone: "normal"
     });
 
     function loadSettings() {
@@ -31,6 +33,9 @@
         }
         s.particleSpeed = Math.max(5, Math.min(100, Number(s.particleSpeed) || 45));
         s.particleLinesCount = Math.max(1, Math.min(40, Number(s.particleLinesCount) || 7));
+        if (!["normal", "sepia", "cool", "dark"].includes(s.pdfTextTone)) {
+            s.pdfTextTone = "normal";
+        }
         s.uiAnimations = s.uiAnimations !== false;
         return s;
     }
@@ -190,10 +195,12 @@
                 ctx.fill();
             });
         } else if (particlesState.mode === "lines") {
-            ctx.lineWidth = 1.65;
+            ctx.lineWidth = 2.7;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
             ctx.strokeStyle = "rgba(255,255,255,0.65)";
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = "rgba(255,255,255,0.32)";
             const tWave = time * 1.06;
             const baseAmp = Math.min(w, h) * 0.96 * sf;
             const bend = Math.sin(tWave) * baseAmp + Math.cos(tWave * 0.68) * baseAmp * 0.55;
@@ -233,6 +240,7 @@
                 );
             }
             ctx.stroke();
+            ctx.shadowBlur = 0;
             ctx.globalAlpha = 0.35;
             ctx.strokeStyle = "rgba(255,255,255,0.55)";
         } else if (particlesState.mode === "stars") {
@@ -326,6 +334,8 @@
         const speedVal = document.getElementById("settings-particle-speed-val");
         const linesRange = document.getElementById("settings-particle-lines");
         const linesVal = document.getElementById("settings-particle-lines-val");
+        const pdfBgSel = document.getElementById("settings-pdf-bg");
+        const pdfTextToneSel = document.getElementById("settings-pdf-text-tone");
         if (themeSel) {
             themeSel.value = s.bgTheme;
         }
@@ -347,6 +357,12 @@
         if (linesVal) {
             linesVal.textContent = String(s.particleLinesCount);
         }
+        if (pdfBgSel) {
+            pdfBgSel.value = s.pdfBg;
+        }
+        if (pdfTextToneSel) {
+            pdfTextToneSel.value = s.pdfTextTone;
+        }
         document.querySelectorAll('input[name="settings-particle-mode"]').forEach((inp) => {
             inp.checked = inp.value === s.particleMode;
         });
@@ -359,6 +375,8 @@
         const gradCb = document.getElementById("settings-gradient-shimmer");
         const speedRange = document.getElementById("settings-particle-speed");
         const linesRange = document.getElementById("settings-particle-lines");
+        const pdfBgSel = document.getElementById("settings-pdf-bg");
+        const pdfTextToneSel = document.getElementById("settings-pdf-text-tone");
         let particleMode = "none";
         document.querySelectorAll('input[name="settings-particle-mode"]').forEach((inp) => {
             if (inp.checked) {
@@ -372,7 +390,9 @@
             gradientShimmer: gradCb ? gradCb.checked : true,
             particleMode,
             particleSpeed: speedRange ? Number(speedRange.value) : 45,
-            particleLinesCount: Math.max(1, Math.min(40, Number.isFinite(rawLines) ? rawLines : 7))
+            particleLinesCount: Math.max(1, Math.min(40, Number.isFinite(rawLines) ? rawLines : 7)),
+            pdfBg: pdfBgSel ? pdfBgSel.value : "#2a3142",
+            pdfTextTone: pdfTextToneSel ? pdfTextToneSel.value : "normal"
         };
     }
 
@@ -390,6 +410,17 @@
         if (canvas) {
             particlesState = null;
         }
+        document.documentElement.style.setProperty("--knigi-pdf-bg", s.pdfBg || "#2a3142");
+        const toneMap = {
+            normal: "none",
+            sepia: "sepia(0.45) saturate(0.9)",
+            cool: "hue-rotate(180deg) saturate(0.85)",
+            dark: "grayscale(0.15) brightness(0.8) contrast(1.15)"
+        };
+        document.documentElement.style.setProperty(
+            "--knigi-pdf-filter",
+            toneMap[s.pdfTextTone] || toneMap.normal
+        );
     }
 
     function openPanel(backdrop, panel, btn) {
@@ -437,6 +468,8 @@
         const speedVal = document.getElementById("settings-particle-speed-val");
         const linesRange = document.getElementById("settings-particle-lines");
         const linesVal = document.getElementById("settings-particle-lines-val");
+        const pdfBgSel = document.getElementById("settings-pdf-bg");
+        const pdfTextToneSel = document.getElementById("settings-pdf-text-tone");
 
         if (themeSel && window.KnigiBG_THEMES) {
             themeSel.innerHTML = "";
@@ -491,6 +524,8 @@
             }
             persistFromForm();
         });
+        pdfBgSel?.addEventListener("change", persistFromForm);
+        pdfTextToneSel?.addEventListener("change", persistFromForm);
         document.querySelectorAll('input[name="settings-particle-mode"]').forEach((inp) => {
             inp.addEventListener("change", () => {
                 syncLinesCountRowVisibility();

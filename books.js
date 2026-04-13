@@ -234,7 +234,10 @@ function getBookTags(book) {
     if (!Array.isArray(t)) {
         return [];
     }
-    return t.map((x) => String(x).trim()).filter(Boolean);
+    return t
+        .map((x) => String(x).trim())
+        .filter(Boolean)
+        .slice(0, 7);
 }
 
 function getFilteredBooks() {
@@ -417,6 +420,139 @@ function getBookRating(bookId) {
     return 0;
 }
 
+const RATINGS_TABLE = "library_book_ratings";
+const DEVICE_ID_KEY = "knigi-device-id-v1";
+let ratingsServerAvg = {};
+let ratingsReady = false;
+let ratingsFetchPromise = null;
+let ratingsInited = false;
+
+function getSupabaseCfg() {
+    return window.LIBRARY_CHAT_SUPABASE || null;
+}
+
+function ensureDeviceId() {
+    try {
+        let id = localStorage.getItem(DEVICE_ID_KEY);
+        if (id) {
+            return id;
+        }
+        id =
+            (window.crypto && window.crypto.randomUUID && window.crypto.randomUUID()) ||
+            `dev-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        localStorage.setItem(DEVICE_ID_KEY, id);
+        return id;
+    } catch {
+        return `dev-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+}
+
+function getBookRatingSummary(bookId) {
+    if (ratingsReady && ratingsServerAvg[bookId]) {
+        const r = ratingsServerAvg[bookId];
+        return {
+            avg: r.avg,
+            votes: r.votes
+        };
+    }
+    const own = getBookRating(bookId);
+    return {
+        avg: own,
+        votes: own > 0 ? 1 : 0
+    };
+}
+
+async function fetchRatingsFromServer() {
+    const cfg = getSupabaseCfg();
+    if (!cfg || !cfg.url || !cfg.anonKey) {
+        ratingsReady = false;
+        return;
+    }
+    const baseUrl = String(cfg.url).replace(/\/$/, "");
+    const q = `${baseUrl}/rest/v1/${RATINGS_TABLE}?select=book_id,rating`;
+    const res = await fetch(q, {
+        headers: {
+            apikey: cfg.anonKey,
+            Authorization: `Bearer ${cfg.anonKey}`,
+            Accept: "application/json"
+        }
+    });
+    if (!res.ok) {
+        throw new Error(`ratings ${res.status}`);
+    }
+    const rows = await res.json();
+    const agg = {};
+    if (Array.isArray(rows)) {
+        rows.forEach((row) => {
+            const id = String(row.book_id || "");
+            const n = Number(row.rating);
+            if (!id || !(n >= 1 && n <= 5)) {
+                return;
+            }
+            if (!agg[id]) {
+                agg[id] = { sum: 0, votes: 0 };
+            }
+            agg[id].sum += n;
+            agg[id].votes += 1;
+        });
+    }
+    const map = {};
+    Object.keys(agg).forEach((id) => {
+        map[id] = {
+            avg: Math.round((agg[id].sum / agg[id].votes) * 10) / 10,
+            votes: agg[id].votes
+        };
+    });
+    ratingsServerAvg = map;
+    ratingsReady = true;
+}
+
+function ensureRatingsLoaded() {
+    if (ratingsFetchPromise) {
+        return ratingsFetchPromise;
+    }
+    ratingsFetchPromise = fetchRatingsFromServer()
+        .catch(() => {
+            ratingsReady = false;
+        })
+        .finally(() => {
+            ratingsFetchPromise = null;
+        });
+    return ratingsFetchPromise;
+}
+
+async function pushRatingToServer(bookId, stars) {
+    const cfg = getSupabaseCfg();
+    if (!cfg || !cfg.url || !cfg.anonKey) {
+        return;
+    }
+    const baseUrl = String(cfg.url).replace(/\/$/, "");
+    const deviceId = ensureDeviceId();
+    const payload = [
+        {
+            book_id: String(bookId),
+            rating: Math.max(1, Math.min(5, Math.round(Number(stars)))),
+            device_id: deviceId
+        }
+    ];
+    const res = await fetch(
+        `${baseUrl}/rest/v1/${RATINGS_TABLE}?on_conflict=book_id,device_id`,
+        {
+            method: "POST",
+            headers: {
+                apikey: cfg.anonKey,
+                Authorization: `Bearer ${cfg.anonKey}`,
+                "Content-Type": "application/json",
+                Prefer: "resolution=merge-duplicates,return=minimal"
+            },
+            body: JSON.stringify(payload)
+        }
+    );
+    if (!res.ok) {
+        throw new Error(`vote ${res.status}`);
+    }
+}
+
 function setBookRating(bookId, stars) {
     const val = Math.max(1, Math.min(5, Math.round(Number(stars))));
     const key = getRatingStorageKey();
@@ -531,6 +667,10 @@ function bindLibraryGridUi() {
         }
         setBookRating(bookId, value);
         renderLibrary();
+        pushRatingToServer(bookId, value)
+            .then(() => ensureRatingsLoaded())
+            .then(() => renderLibrary())
+            .catch(() => {});
     });
     grid.addEventListener("change", (e) => {
         const input = e.target.closest(".book-cover-file");
@@ -578,6 +718,7 @@ function renderLibrary() {
     grid.innerHTML = list
         .map((book, idx) => {
             const rating = getBookRating(book.id);
+            const summary = getBookRatingSummary(book.id);
             const href = `reader.html?book=${encodeURIComponent(book.id)}`;
             const prefix = `lib-${idx}`;
             const seriesChip = book.seriesTitle
@@ -611,6 +752,7 @@ function renderLibrary() {
                     )}»">
                         ${renderStarButtons(book.id, rating, prefix)}
                     </div>
+                    <span>${summary.avg > 0 ? `${summary.avg} (${summary.votes})` : "—"}</span>
                 </div>
             </article>
         `;
@@ -999,7 +1141,16 @@ function initReaderRatingUi() {
 
     const paint = () => {
         const r = getBookRating(readerState.book.id);
+        const summary = getBookRatingSummary(readerState.book.id);
         container.innerHTML = renderStarButtons(readerState.book.id, r, "reader");
+        if (labelEl) {
+            labelEl.textContent =
+                summary.avg > 0
+                    ? `Общая оценка: ${summary.avg} (${summary.votes})`
+                    : USE_GLOBAL_BOOK_RATINGS
+                      ? "Общая оценка:"
+                      : "Ваша оценка:";
+        }
         container.querySelectorAll(".star-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
                 const v = Number(btn.dataset.value);
@@ -1009,6 +1160,15 @@ function initReaderRatingUi() {
                 if (grid) {
                     renderLibrary();
                 }
+                pushRatingToServer(readerState.book.id, v)
+                    .then(() => ensureRatingsLoaded())
+                    .then(() => {
+                        paint();
+                        if (grid) {
+                            renderLibrary();
+                        }
+                    })
+                    .catch(() => {});
             });
         });
     };
@@ -1021,6 +1181,7 @@ function bindFullscreenControls() {
     const btn = document.getElementById("reader-fullscreen-btn");
     const wrap = document.getElementById("reader-frame-wrap");
     const closeBtn = document.getElementById("reader-pseudo-fs-close");
+    const settingsFab = document.getElementById("settings-fab");
     if (!btn || !wrap || readerState.fullscreenBound) {
         return;
     }
@@ -1067,7 +1228,10 @@ function bindFullscreenControls() {
                 : "Развернуть область чтения";
         }
         if (closeBtn) {
-            closeBtn.hidden = !isPseudoFullscreen();
+            closeBtn.hidden = !isAnyFullscreen();
+        }
+        if (settingsFab) {
+            settingsFab.hidden = isAnyFullscreen();
         }
     };
 
@@ -1190,6 +1354,17 @@ window.applyKnigiBgTheme = applyBgTheme;
 window.KnigiBG_THEMES = BG_THEMES;
 
 migratePersonalRatingsToGlobalOnce();
+if (!ratingsInited) {
+    ratingsInited = true;
+    ensureRatingsLoaded()
+        .then(() => {
+            renderLibrary();
+            if (readerState.book) {
+                initReaderRatingUi();
+            }
+        })
+        .catch(() => {});
+}
 bindLibraryFilters();
 renderLibrary();
 renderReader();

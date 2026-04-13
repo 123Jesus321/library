@@ -5,7 +5,8 @@
  * Откройте рядом файл supabase-chat-setup.sql: замените YOUR_LONG_SECRET на свой секрет (как moderatorSecret ниже),
  * затем вставьте весь файл в Supabase → SQL Editor → Run.
  *
- * 1) Альтернатива — вручную выполнить скрипт (одним блоком, секрет вместо YOUR_LONG_SECRET, ≥8 символов):
+ * 1) Выполните файл supabase-chat-setup.sql целиком (он включает чат, IP-баны и общие оценки книг).
+ *    Ниже оставлена старая справка как пример структуры.
  *
  *    create table library_chat_messages (
  *      id uuid primary key default gen_random_uuid(),

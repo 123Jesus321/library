@@ -31,6 +31,7 @@
     const banListEl = document.getElementById("library-chat-ban-list");
 
     const NICK_KEY = "knigi-chat-nick";
+    const CHAT_RULES_SHOWN_KEY = "knigi-chat-rules-shown-v1";
     let pollTimer = null;
     let configured = !!(baseUrl && anonKey);
     const modSecretOk = moderatorSecret.length >= 8;
@@ -167,7 +168,7 @@
             showMod && modSecretOk
                 ? `<span class="library-chat-msg-actions">
             <button type="button" class="library-chat-msg-btn library-chat-msg-del" data-msg-id="${idAttr}" title="Удалить сообщение">✕</button>
-            <button type="button" class="library-chat-msg-btn library-chat-msg-ban" data-ban-nick="${nickAttr}" title="Забанить ник (новые сообщения)">🚫</button>
+            <button type="button" class="library-chat-msg-btn library-chat-msg-ban" data-ban-msg-id="${idAttr}" data-ban-nick="${nickAttr}" title="Забанить автора по IP">🚫</button>
         </span>`
                 : "";
         return `<li class="library-chat-msg" data-id="${escapeAttr(String(row.id))}">
@@ -186,7 +187,7 @@
             }
             return;
         }
-        const q = `${baseUrl}/rest/v1/${encodeURIComponent(bansTable)}?select=nick,created_at&order=created_at.desc`;
+        const q = `${baseUrl}/rest/v1/${encodeURIComponent(bansTable)}?select=ip_hash,created_at&order=created_at.desc`;
         const res = await fetch(q, {
             headers: {
                 ...restHeaders(),
@@ -199,15 +200,17 @@
         }
         const rows = await res.json();
         if (!Array.isArray(rows) || rows.length === 0) {
-            banListEl.innerHTML = `<li class="library-chat-ban-item library-chat-ban-empty">Нет забаненных ников.</li>`;
+            banListEl.innerHTML = `<li class="library-chat-ban-item library-chat-ban-empty">Нет активных IP-банов.</li>`;
             return;
         }
         banListEl.innerHTML = rows
             .map((r) => {
-                const nn = escapeAttr(String(r.nick));
+                const hash = String(r.ip_hash || "");
+                const nn = escapeAttr(hash);
                 const when = escapeHtml(formatTime(r.created_at));
+                const shortHash = hash ? `${hash.slice(0, 10)}…` : "—";
                 return `<li class="library-chat-ban-item">
-                <span class="library-chat-ban-nick">${escapeHtml(r.nick)}</span>
+                <span class="library-chat-ban-nick">IP hash: ${escapeHtml(shortHash)}</span>
                 <span class="library-chat-ban-when">${when}</span>
                 <button type="button" class="library-chat-msg-btn library-chat-unban" data-unban-nick="${nn}">Снять</button>
             </li>`;
@@ -281,6 +284,21 @@
             root.classList.toggle("library-chat--open", willOpen);
             syncChatToggleUi();
             if (willOpen && configured) {
+                try {
+                    if (!localStorage.getItem(CHAT_RULES_SHOWN_KEY)) {
+                        window.alert(
+                            "Здравствуйте, дорогие читатели!\n\n" +
+                                "Правила чата:\n" +
+                                "1) Запрещены мат, оскорбления, травля, унижение участников, писателей и комиссии.\n" +
+                                "2) Запрещены пропаганда нетрадиционных ценностей, экстремизма, терроризма и распространение подобных материалов.\n" +
+                                "3) Запрещены угрозы, призывы к насилию, спам, флуд и намеренное засорение чата.\n" +
+                                "4) За нарушения применяется блокировка доступа к чату."
+                        );
+                        localStorage.setItem(CHAT_RULES_SHOWN_KEY, "1");
+                    }
+                } catch {
+                    /* ignore */
+                }
                 fetchMessages().catch(() => {});
             }
         });
@@ -338,14 +356,19 @@
                     return;
                 }
                 const targetNick = ban.getAttribute("data-ban-nick");
-                if (!targetNick || !window.confirm(`Забанить ник «${targetNick}»? Новые сообщения под этим именем будут отклоняться.`)) {
+                const msgId = ban.getAttribute("data-ban-msg-id");
+                if (
+                    !targetNick ||
+                    !msgId ||
+                    !window.confirm(`Забанить автора «${targetNick}» по IP? Сообщения с этого адреса будут блокироваться.`)
+                ) {
                     return;
                 }
                 setStatus("Бан…", false);
                 try {
-                    await rpcVoid("chat_mod_ban_nick", {
+                    await rpcVoid("chat_mod_ban_ip_by_message", {
                         p_secret: moderatorSecret,
-                        p_nick: targetNick
+                        p_msg_id: msgId
                     });
                     setStatus("");
                     await fetchMessages();
@@ -367,14 +390,14 @@
                 return;
             }
             const nn = btn.getAttribute("data-unban-nick");
-            if (!nn || !window.confirm(`Снять бан с «${nn}»?`)) {
+            if (!nn || !window.confirm("Снять IP-бан?")) {
                 return;
             }
             setStatus("Снятие бана…", false);
             try {
-                await rpcVoid("chat_mod_unban_nick", {
+                await rpcVoid("chat_mod_unban_ip", {
                     p_secret: moderatorSecret,
-                    p_nick: nn
+                    p_ip_hash: nn
                 });
                 setStatus("");
                 await fetchBanList();

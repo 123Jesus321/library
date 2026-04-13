@@ -13,6 +13,8 @@
     --knigi-ui-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     /* Цвет, тень, border — без резких скачков */
     --knigi-ui-ease-soft: cubic-bezier(0.45, 0, 0.25, 1);
+    --knigi-pdf-bg: #2a3142;
+    --knigi-pdf-filter: none;
 }
 
 html[data-knigi-ui-animations="off"] {
@@ -1150,7 +1152,7 @@ main.reader-page {
     -webkit-overflow-scrolling: touch;
     text-align: center;
     padding: 0.5rem;
-    background: #2a3142;
+    background: var(--knigi-pdf-bg);
 }
 
 #pdf-canvas {
@@ -1159,6 +1161,7 @@ main.reader-page {
     max-width: 100%;
     height: auto;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+    filter: var(--knigi-pdf-filter);
 }
 
 .pdf-error {
@@ -1260,7 +1263,7 @@ body.reader-fs-pseudo-active {
 
 .pseudo-fs-close {
     position: absolute;
-    top: max(0.45rem, env(safe-area-inset-top, 0px));
+    top: max(3.55rem, calc(env(safe-area-inset-top, 0px) + 3rem));
     right: max(0.45rem, env(safe-area-inset-right, 0px));
     z-index: 5;
     width: 44px;
@@ -1277,6 +1280,11 @@ body.reader-fs-pseudo-active {
     display: grid;
     place-items: center;
     padding: 0;
+}
+
+.reader-frame-wrap:fullscreen .pseudo-fs-close,
+.reader-frame-wrap.reader-frame-wrap--pseudo-fs .pseudo-fs-close {
+    position: fixed;
 }
 
 .pseudo-fs-close:hover {
