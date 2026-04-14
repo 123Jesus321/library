@@ -1218,6 +1218,7 @@ function bindFullscreenControls() {
 
     const syncLabel = () => {
         const on = isAnyFullscreen();
+        document.body.classList.toggle("reader-fs-active", on);
         if (on) {
             btn.textContent = "⛶ Выйти из полного экрана";
             btn.title = "Выйти из полноэкранного режима";

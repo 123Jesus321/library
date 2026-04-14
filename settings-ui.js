@@ -99,7 +99,7 @@
             return {
                 mode,
                 items: Array.from({ length: n }, () => {
-                    const halfLen = diag * (0.7 + Math.random() * 0.65);
+                    const halfLen = diag * (0.95 + Math.random() * 0.95);
                     return {
                         cx: (Math.random() - 0.15) * (w * 1.3),
                         cy: (Math.random() - 0.15) * (h * 1.3),
@@ -195,19 +195,18 @@
                 ctx.fill();
             });
         } else if (particlesState.mode === "lines") {
-            ctx.lineWidth = 2.7;
+            ctx.lineWidth = 4.2;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
             ctx.strokeStyle = "rgba(255,255,255,0.65)";
-            ctx.shadowBlur = 12;
-            ctx.shadowColor = "rgba(255,255,255,0.32)";
+            ctx.shadowBlur = 26;
+            ctx.shadowColor = "rgba(255,255,255,0.42)";
             const tWave = time * 1.06;
             const baseAmp = Math.min(w, h) * 0.96 * sf;
             const bend = Math.sin(tWave) * baseAmp + Math.cos(tWave * 0.68) * baseAmp * 0.55;
             const bendK = bend * 6.05;
             ctx.globalAlpha = 0.22 + Math.sin(tWave) * 0.1;
             const items = particlesState.items;
-            ctx.beginPath();
             for (let i = 0; i < items.length; i += 1) {
                 const ln = items[i];
                 const c = Math.cos(ln.ang);
@@ -229,6 +228,14 @@
                 const y1 = ln.cy - s * hl;
                 const x2 = ln.cx + c * hl;
                 const y2 = ln.cy + s * hl;
+                const grad = ctx.createLinearGradient(x1, y1, x2, y2);
+                grad.addColorStop(0, "rgba(255,255,255,0)");
+                grad.addColorStop(0.18, "rgba(255,255,255,0.52)");
+                grad.addColorStop(0.5, "rgba(255,255,255,0.9)");
+                grad.addColorStop(0.82, "rgba(255,255,255,0.52)");
+                grad.addColorStop(1, "rgba(255,255,255,0)");
+                ctx.strokeStyle = grad;
+                ctx.beginPath();
                 ctx.moveTo(x1, y1);
                 ctx.bezierCurveTo(
                     x1 + c * t + nx * k,
@@ -238,8 +245,8 @@
                     x2,
                     y2
                 );
+                ctx.stroke();
             }
-            ctx.stroke();
             ctx.shadowBlur = 0;
             ctx.globalAlpha = 0.35;
             ctx.strokeStyle = "rgba(255,255,255,0.55)";

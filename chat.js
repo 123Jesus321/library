@@ -139,7 +139,7 @@
         if (!configured) {
             return;
         }
-        const q = `${baseUrl}/rest/v1/${encodeURIComponent(table)}?select=id,nick,body,created_at&order=created_at.asc&limit=80`;
+        const q = `${baseUrl}/rest/v1/${encodeURIComponent(table)}?select=id,nick,body,created_at,ip_hash&order=created_at.asc&limit=80`;
         const res = await fetch(q, {
             headers: {
                 ...restHeaders(),
@@ -164,11 +164,12 @@
         const nick = row.nick || "Гость";
         const idAttr = escapeAttr(String(row.id));
         const nickAttr = escapeAttr(nick);
+        const ipHashAttr = escapeAttr(String(row.ip_hash || ""));
         const actions =
             showMod && modSecretOk
                 ? `<span class="library-chat-msg-actions">
             <button type="button" class="library-chat-msg-btn library-chat-msg-del" data-msg-id="${idAttr}" title="Удалить сообщение">✕</button>
-            <button type="button" class="library-chat-msg-btn library-chat-msg-ban" data-ban-msg-id="${idAttr}" data-ban-nick="${nickAttr}" title="Забанить автора по IP">🚫</button>
+            <button type="button" class="library-chat-msg-btn library-chat-msg-ban" data-ban-msg-id="${idAttr}" data-ban-nick="${nickAttr}" data-ban-ip-hash="${ipHashAttr}" title="Забанить автора по IP">🚫</button>
         </span>`
                 : "";
         return `<li class="library-chat-msg" data-id="${escapeAttr(String(row.id))}">
@@ -355,10 +356,9 @@
                 if (!isModeratorSession() || !modSecretOk) {
                     return;
                 }
-                const targetNick = ban.getAttribute("data-ban-nick");
+                const targetNick = ban.getAttribute("data-ban-nick") || "Гость";
                 const msgId = ban.getAttribute("data-ban-msg-id");
                 if (
-                    !targetNick ||
                     !msgId ||
                     !window.confirm(`Забанить автора «${targetNick}» по IP? Сообщения с этого адреса будут блокироваться.`)
                 ) {

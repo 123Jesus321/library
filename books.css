@@ -371,6 +371,10 @@ body[data-bg-theme="copper-eclipse"] {
     transform: scale(1.06);
 }
 
+body.reader-fs-active .settings-fab {
+    display: none !important;
+}
+
 .settings-backdrop {
     position: fixed;
     inset: 0;
@@ -1282,9 +1286,19 @@ body.reader-fs-pseudo-active {
     padding: 0;
 }
 
+.pseudo-fs-close[hidden] {
+    display: none !important;
+}
+
+body:not(.reader-fs-active) .pseudo-fs-close {
+    display: none !important;
+}
+
 .reader-frame-wrap:fullscreen .pseudo-fs-close,
 .reader-frame-wrap.reader-frame-wrap--pseudo-fs .pseudo-fs-close {
     position: fixed;
+    top: max(0.45rem, env(safe-area-inset-top, 0px));
+    right: max(0.45rem, env(safe-area-inset-right, 0px));
 }
 
 .pseudo-fs-close:hover {
