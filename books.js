@@ -10,7 +10,7 @@ const books = [
         seriesOrder: null,
         updatedAt: "2025-08-12",
         tags: ["рассказы", "юмор"],
-        coverImage: null
+        coverImage: "Symashedsuy.jpg"
     },
     {
         id: "Зеронтар-_1_",
@@ -82,6 +82,18 @@ const books = [
         seriesOrder: null,
         updatedAt: "2026-01-10",
         tags: ["проза", "драма"],
+        coverImage: null
+    },
+    {
+        id: "Виртуаль. Мир Хранителей",
+        title: "Виртуаль. Мир Хранителей",
+        author: "Вистериона",
+        pdf: "Бредни-Сумасшедшего.pdf",
+        seriesId: "Virtual-ras",
+        seriesTitle: 'Виртуаль',
+        seriesOrder: 1,
+        updatedAt: "26-04-25",
+        tags: ["рассказы", "юмор"],
         coverImage: null
     },
     {
