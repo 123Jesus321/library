@@ -117,7 +117,7 @@ const books = [
         seriesTitle: "Проза SomeBadHum",
         seriesOrder: 3,
         updatedAt: "2026-03-16",
-        tags: ["фэнтези", "Терриана"],
+        tags: ["фэнтези"],
         coverImage: null
     },
     {
@@ -129,7 +129,7 @@ const books = [
         seriesTitle: "Проза SomeBadHum",
         seriesOrder: 4,
         updatedAt: "2026-03-16",
-        tags: ["фэнтези", "Терриана"],
+        tags: ["фэнтези"],
         coverImage: null
     }
 ];
