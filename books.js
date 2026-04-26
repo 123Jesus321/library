@@ -90,7 +90,7 @@ const books = [
         author: "Вистериона",
         pdf: "VirtualWorldOfGuard.pdf",
         seriesId: "Virtual-ras",
-        seriesTitle: 'Виртуаль',
+        seriesTitle: "Виртуаль",
         seriesOrder: 1,
         updatedAt: "26-04-25",
         tags: ["рассказы", "юмор"],
