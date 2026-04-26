@@ -107,6 +107,30 @@ const books = [
         updatedAt: "2025-12-22",
         tags: ["стихи", "проза"],
         coverImage: null
+    },
+    {
+        id: "Кладбище и маяк",
+        title: "Кладбище и маяк",
+        author: "SomeBadHum",
+        pdf: "Kladbishe.pdf",
+        seriesId: "somebadhum-prose",
+        seriesTitle: "Проза SomeBadHum",
+        seriesOrder: 3,
+        updatedAt: "2026-03-16",
+        tags: ["фэнтези"],
+        coverImage: null
+    },
+    {
+        id: "22",
+        title: "22",
+        author: "SomeBadHum",
+        pdf: "22.pdf",
+        seriesId: "somebadhum-prose",
+        seriesTitle: "Проза SomeBadHum",
+        seriesOrder: 4,
+        updatedAt: "2026-03-16",
+        tags: ["фэнтези"],
+        coverImage: null
     }
 ];
 
