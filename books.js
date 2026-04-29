@@ -88,7 +88,7 @@ const books = [
         id: "Виртуаль. Мир Хранителей",
         title: "Виртуаль. Мир Хранителей",
         author: "Вистериона",
-        pdf: "VirtualWorldOfGuard.pdf",
+        pdf: "VirtualWorldOfGuard (2).pdf",
         seriesId: "Virtual-ras",
         seriesTitle: "Виртуаль",
         seriesOrder: 1,
