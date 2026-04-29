@@ -121,8 +121,8 @@ const books = [
         coverImage: null
     },
     {
-        id: "22",
-        title: "22",
+        id: "...",
+        title: "...",
         author: "SomeBadHum",
         pdf: "22.pdf",
         seriesId: "somebadhum-prose",
