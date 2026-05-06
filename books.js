@@ -1,18 +1,6 @@
 /** seriesId: общий id для книг одной серии; seriesOrder — порядок в серии; updatedAt — ISO для сортировки */
 const books = [
     {
-        id: "Бредни-Сумасшедшего",
-        title: "Бредни Сумасшедшего",
-        author: "Сумасшедший",
-        pdf: "Бредни-Сумасшедшего.pdf",
-        seriesId: null,
-        seriesTitle: null,
-        seriesOrder: null,
-        updatedAt: "2025-08-12",
-        tags: ["рассказы", "юмор"],
-        coverImage: "Symashedsuy.jpg"
-    },
-    {
         id: "Зеронтар-_1_",
         title: "Зеронтар",
         author: "Конфетки Миллер",
